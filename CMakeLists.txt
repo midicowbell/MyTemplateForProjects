@@ -1,26 +1,26 @@
-# указываем последнюю доступную версию CMake
 cmake_minimum_required(VERSION 3.14)
 
-# стандарт языка
+project(MyProject)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# название проекта
-project(MyProject)
-
 # подключаем функции (если нужны)
-include(cmake/functions.cmake)
+include(cmake/functions.cmake OPTIONAL)
 
-# подключаем подкаталоги
-add_subdirectory(lib)   # библиотека
-add_subdirectory(src)   # основной исполняемый файл
+# библиотеки
+add_subdirectory(libMonom)
+add_subdirectory(libPolynom)
 
-# опция для тестов
+# основной исполняемый файл
+add_subdirectory(src)
+
 option(BUILD_TESTS "Build unit tests?" ON)
 
 if(BUILD_TESTS)
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    add_subdirectory(third_party/gtest EXCLUDE_FROM_ALL)
+    add_subdirectory(third_party/googletest EXCLUDE_FROM_ALL)
+
     enable_testing()
     add_subdirectory(tests)
 endif()
