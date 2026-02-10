@@ -88,8 +88,20 @@ Monom& Monom::operator*=(double k) {
 	coeff *= k;
 	return *this;
 }
+Monom Monom::operator*(double k) const {
+	return Monom(coeff * k, deg[0], deg[1], deg[2]);
+}
+Monom Monom::operator/(double k) const {
+	if (k == 0.0) {
+		throw std::invalid_argument("Cannot divide by zero");
+	}
+	return Monom(coeff / k, deg[0], deg[1], deg[2]);
+}
 Monom& Monom::operator/=(double k) {
-	coeff *= k;
+	if (k == 0.0) {
+		throw std::invalid_argument("Cannot divide by zero");
+	}
+	coeff /= k;
 	return *this;
 }
 Monom Monom::operator-() const {
@@ -112,4 +124,16 @@ std::istream& operator>>(std::istream& is, Monom& m) {
 	std::cout << "Enter degree for z: ";
 	is >> m.deg[2];
 	return is;
+}
+bool Monom::operator>(const Monom& other) const {
+	if (deg[0] != other.getDegX()) {
+		return deg[0] > other.getDegX();
+	}
+	if (deg[1] != other.getDegY()) {
+		return deg[1] > other.getDegY();
+	}
+	if (deg[2] != other.getDegZ()) {
+		return deg[2] > other.getDegZ();
+	}
+	return coeff > other.getCoef();
 }

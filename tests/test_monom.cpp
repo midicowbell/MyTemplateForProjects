@@ -304,3 +304,95 @@ TEST(MonomIO, InputOperator) {
     EXPECT_EQ(m.getDegY(), 2);
     EXPECT_EQ(m.getDegZ(), 1);
 }
+//
+// == и !=
+//
+TEST(MonomCompare, Equal) {
+    Monom a(3.0, 1, 2, 3);
+    Monom b(3.0, 1, 2, 3);
+    EXPECT_TRUE(a == b);
+}
+
+TEST(MonomCompare, NotEqual) {
+    Monom a(3.0, 1, 2, 3);
+    Monom b(4.0, 1, 2, 3);
+    EXPECT_TRUE(a != b);
+}
+
+//
+// + и +=
+//
+TEST(MonomPlus, AddSimilar) {
+    Monom a(3.0, 2, 1, 0);
+    Monom b(5.0, 2, 1, 0);
+    Monom c = a + b;
+    EXPECT_DOUBLE_EQ(c.getCoef(), 8.0);
+}
+
+TEST(MonomPlus, AddDifferentThrows) {
+    Monom a(3.0, 2, 1, 0);
+    Monom b(5.0, 3, 1, 0);
+    EXPECT_THROW(a + b, std::invalid_argument);
+}
+
+TEST(MonomPlusEqual, AddSimilar) {
+    Monom a(3.0, 2, 1, 0);
+    Monom b(5.0, 2, 1, 0);
+    a += b;
+    EXPECT_DOUBLE_EQ(a.getCoef(), 8.0);
+}
+
+TEST(MonomPlusEqual, AddDifferentThrows) {
+    Monom a(3.0, 2, 1, 0);
+    Monom b(5.0, 3, 1, 0);
+    EXPECT_THROW(a += b, std::invalid_argument);
+}
+TEST(MonomScalarOps, MulScalar) {
+    Monom m(3.0, 2, 1, 0);
+
+    Monom r = m * 2.0;
+
+    EXPECT_DOUBLE_EQ(r.getCoef(), 6.0);
+    EXPECT_EQ(r.getDegX(), 2);
+    EXPECT_EQ(r.getDegY(), 1);
+    EXPECT_EQ(r.getDegZ(), 0);
+}
+
+TEST(MonomScalarOps, DivScalar) {
+    Monom m(6.0, 2, 1, 0);
+
+    Monom r = m / 2.0;
+
+    EXPECT_DOUBLE_EQ(r.getCoef(), 3.0);
+    EXPECT_EQ(r.getDegX(), 2);
+    EXPECT_EQ(r.getDegY(), 1);
+    EXPECT_EQ(r.getDegZ(), 0);
+}
+
+TEST(MonomScalarOps, DivScalarThrowsOnZero) {
+    Monom m(6.0, 2, 1, 0);
+
+    EXPECT_THROW(m / 0.0, std::invalid_argument);
+}
+
+TEST(MonomScalarOps, MulScalarInPlace) {
+    Monom m(3.0, 2, 1, 0);
+
+    m *= 2.0;
+
+    EXPECT_DOUBLE_EQ(m.getCoef(), 6.0);
+}
+
+TEST(MonomScalarOps, DivScalarInPlace) {
+    Monom m(6.0, 2, 1, 0);
+
+    m /= 2.0;
+
+    EXPECT_DOUBLE_EQ(m.getCoef(), 3.0);
+}
+
+TEST(MonomScalarOps, DivScalarInPlaceThrowsOnZero) {
+    Monom m(6.0, 2, 1, 0);
+
+    EXPECT_THROW(m /= 0.0, std::invalid_argument);
+}

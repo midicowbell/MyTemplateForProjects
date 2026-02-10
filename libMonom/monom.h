@@ -24,6 +24,9 @@ public:
 	Monom& operator-=(const Monom& other);
 	Monom& operator*=(const Monom& other);
 	Monom& operator/=(const Monom& other);
+	bool operator>(const Monom& other) const;
+	Monom operator*(double k) const;
+	Monom operator/(double k) const;
 	Monom& operator*=(double k);
 	Monom& operator/=(double k);
 	Monom operator-() const;
