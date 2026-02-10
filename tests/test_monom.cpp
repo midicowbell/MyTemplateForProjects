@@ -160,3 +160,147 @@ TEST(MonomDivision, NegativeDegreeThrows) {
     EXPECT_THROW(a / b, std::invalid_argument);
 }
 
+
+//
+// +=
+//
+TEST(MonomPlusEqual, AddSimilarMonoms) {
+    Monom a(3.0, 2, 1, 0);
+    Monom b(5.0, 2, 1, 0);
+
+    a += b;
+
+    EXPECT_DOUBLE_EQ(a.getCoef(), 8.0);
+    EXPECT_EQ(a.getDegX(), 2);
+    EXPECT_EQ(a.getDegY(), 1);
+    EXPECT_EQ(a.getDegZ(), 0);
+}
+
+TEST(MonomPlusEqual, AddDifferentDegreesThrows) {
+    Monom a(3.0, 2, 1, 0);
+    Monom b(5.0, 3, 1, 0);
+
+    EXPECT_THROW(a += b, std::invalid_argument);
+}
+
+//
+// -=
+//
+TEST(MonomMinusEqual, SubtractSimilarMonoms) {
+    Monom a(8.0, 2, 1, 0);
+    Monom b(5.0, 2, 1, 0);
+
+    a -= b;
+
+    EXPECT_DOUBLE_EQ(a.getCoef(), 3.0);
+    EXPECT_EQ(a.getDegX(), 2);
+    EXPECT_EQ(a.getDegY(), 1);
+    EXPECT_EQ(a.getDegZ(), 0);
+}
+
+TEST(MonomMinusEqual, SubtractDifferentDegreesThrows) {
+    Monom a(3.0, 2, 1, 0);
+    Monom b(5.0, 3, 1, 0);
+
+    EXPECT_THROW(a -= b, std::invalid_argument);
+}
+
+//
+// *= (monom)
+//
+TEST(MonomMulEqual, MultiplyMonoms) {
+    Monom a(3.0, 2, 1, 0);
+    Monom b(4.0, 1, 2, 3);
+
+    a *= b;
+
+    EXPECT_DOUBLE_EQ(a.getCoef(), 12.0);
+    EXPECT_EQ(a.getDegX(), 3);
+    EXPECT_EQ(a.getDegY(), 3);
+    EXPECT_EQ(a.getDegZ(), 3);
+}
+
+//
+// /= (monom)
+//
+TEST(MonomDivEqual, DivideMonoms) {
+    Monom a(12.0, 3, 3, 3);
+    Monom b(3.0, 1, 1, 1);
+
+    a /= b;
+
+    EXPECT_DOUBLE_EQ(a.getCoef(), 4.0);
+    EXPECT_EQ(a.getDegX(), 2);
+    EXPECT_EQ(a.getDegY(), 2);
+    EXPECT_EQ(a.getDegZ(), 2);
+}
+
+TEST(MonomDivEqual, DivideByZeroCoefThrows) {
+    Monom a(5.0, 2, 2, 2);
+    Monom b(0.0, 1, 1, 1);
+
+    EXPECT_THROW(a /= b, std::invalid_argument);
+}
+
+TEST(MonomDivEqual, NegativeDegreeThrows) {
+    Monom a(5.0, 1, 1, 1);
+    Monom b(2.0, 2, 0, 0);
+
+    EXPECT_THROW(a /= b, std::invalid_argument);
+}
+
+//
+// / value
+//
+TEST(MonomValue, SimpleValue) {
+    Monom m(3.0, 2, 1, 0); // 3 * x^2 * y^1 * z^0
+
+    double result = m.value(2.0, 3.0, 10.0);
+
+    // 3 * (2^2) * (3^1) * (10^0) = 3 * 4 * 3 * 1 = 36
+    EXPECT_DOUBLE_EQ(result, 36.0);
+}
+
+TEST(MonomValue, ZeroCoefficient) {
+    Monom m(0.0, 5, 5, 5);
+
+    double result = m.value(10.0, 10.0, 10.0);
+
+    EXPECT_DOUBLE_EQ(result, 0.0);
+}
+
+TEST(MonomValue, ZeroVariables) {
+    Monom m(4.0, 3, 2, 1); // 4 * x^3 * y^2 * z^1
+
+    double result = m.value(0.0, 5.0, 7.0);
+
+    // 4 * 0^3 * 5^2 * 7^1 = 0
+    EXPECT_DOUBLE_EQ(result, 0.0);
+}
+
+TEST(MonomValue, AllPowersZero) {
+    Monom m(7.0, 0, 0, 0); // константа
+
+    double result = m.value(100.0, 200.0, 300.0);
+
+    EXPECT_DOUBLE_EQ(result, 7.0);
+}
+TEST(MonomIO, OutputOperator) {
+    Monom m(3.5, 2, 1, 0);
+
+    std::stringstream ss;
+    ss << m;
+
+    EXPECT_EQ(ss.str(), "3.5 * x^2 * y^1 * z^0");
+}
+TEST(MonomIO, InputOperator) {
+    std::stringstream ss("4.2 3 2 1");
+
+    Monom m;
+    ss >> m;
+
+    EXPECT_DOUBLE_EQ(m.getCoef(), 4.2);
+    EXPECT_EQ(m.getDegX(), 3);
+    EXPECT_EQ(m.getDegY(), 2);
+    EXPECT_EQ(m.getDegZ(), 1);
+}

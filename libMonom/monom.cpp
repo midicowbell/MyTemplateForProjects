@@ -54,3 +54,62 @@ Monom Monom::operator/(const Monom& other) const {
 		deg[1] - other.getDegY(),
 		deg[2] - other.getDegZ());
 }
+Monom& Monom::operator+=(const Monom& other) {
+	if (deg[0] != other.getDegX() || deg[1] != other.getDegY() || deg[2] != other.getDegZ()) { throw std::invalid_argument("Cannot add monoms with different degrees"); }
+	coeff += other.getCoef();
+	return *this;
+}
+Monom& Monom::operator-=(const Monom& other) {
+	if (deg[0] != other.getDegX() || deg[1] != other.getDegY() || deg[2] != other.getDegZ()) { throw std::invalid_argument("Cannot subtract monoms with different degrees"); }
+	coeff -= other.getCoef();
+	return *this;
+}
+Monom& Monom::operator*=(const Monom& other) {
+	deg[0] += other.getDegX();
+	deg[1] += other.getDegY();
+	deg[2] += other.getDegZ();
+	coeff *= other.getCoef();
+	return *this;
+}
+Monom& Monom::operator/=(const Monom& other) {
+	deg[0] -= other.getDegX();
+	deg[1] -= other.getDegY();
+	deg[2] -= other.getDegZ();
+	if (other.getCoef() == 0.0) {
+		throw std::invalid_argument("Cannot divide by monom with zero coefficient");
+	}
+	if (deg[0] < 0 || deg[1] < 0 || deg[2] < 0) {
+		throw std::invalid_argument("Resulting monom has negative degree");
+	}
+	coeff /= other.getCoef();
+	return *this;
+}
+Monom& Monom::operator*=(double k) {
+	coeff *= k;
+	return *this;
+}
+Monom& Monom::operator/=(double k) {
+	coeff *= k;
+	return *this;
+}
+Monom Monom::operator-() const {
+	return Monom(-coeff, deg[0], deg[1], deg[2]);
+}
+double Monom::value(double x, double y, double z) const {
+	return coeff * std::pow(x, deg[0]) * std::pow(y, deg[1]) * std::pow(z, deg[2]);
+}
+std::ostream& operator<<(std::ostream& os, const Monom& m) {
+	os << m.coeff << " * x^" << m.deg[0] << " * y^" << m.deg[1] << " * z^" << m.deg[2];
+	return os;
+}
+std::istream& operator>>(std::istream& is, Monom& m) {
+	std::cout << "Enter coefficient: ";
+	is >> m.coeff;
+	std::cout << "Enter degree for x: ";
+	is >> m.deg[0];
+	std::cout << "Enter degree for y: ";
+	is >> m.deg[1];
+	std::cout << "Enter degree for z: ";
+	is >> m.deg[2];
+	return is;
+}

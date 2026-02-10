@@ -9,6 +9,7 @@ private:
 public:
 	Monom(const Monom& other);
 	Monom(double coeff, int degX, int degY, int degZ);
+	Monom() : coeff(0.0) { deg[0] = deg[1] = deg[2] = 0; }
 	double getCoef() const { return coeff; }
 	int getDegX() const { return deg[0]; }
 	int getDegY() const { return deg[1]; }
