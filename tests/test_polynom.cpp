@@ -77,9 +77,9 @@ TEST(PolynomTest, AddMonomRemoveZero) {
 
 TEST(PolynomTest, AddMonomSortedInsert) {
     Polynom p;
-    p.addMonom(Monom(1, 1, 0, 0)); // x
-    p.addMonom(Monom(1, 3, 0, 0)); // x^3
-    p.addMonom(Monom(1, 2, 0, 0)); // x^2
+    p.addMonom(Monom(1, 1, 0, 0)); 
+    p.addMonom(Monom(1, 3, 0, 0)); 
+    p.addMonom(Monom(1, 2, 0, 0)); 
 
     auto it = p.getMonoms().begin();
     EXPECT_EQ(it->getDegX(), 3);
@@ -108,21 +108,21 @@ TEST(PolynomTest, AddMonomInsertAtEnd) {
 
 TEST(PolynomOperators, PlusSimple) {
     Polynom p1;
-    p1.addMonom(Monom(3, 1, 0, 0)); // 3x
-    p1.addMonom(Monom(2, 0, 0, 0)); // 2
+    p1.addMonom(Monom(3, 1, 0, 0));
+    p1.addMonom(Monom(2, 0, 0, 0));
 
     Polynom p2;
-    p2.addMonom(Monom(5, 1, 0, 0)); // 5x
-    p2.addMonom(Monom(-1, 0, 0, 0)); // -1
+    p2.addMonom(Monom(5, 1, 0, 0)); 
+    p2.addMonom(Monom(-1, 0, 0, 0)); 
 
     Polynom p3 = p1 + p2;
 
     auto it = p3.getMonoms().begin();
-    EXPECT_EQ(it->getCoeff(), 8);  // 3x + 5x
+    EXPECT_EQ(it->getCoeff(), 8); 
     EXPECT_EQ(it->getDegX(), 1);
 
     ++it;
-    EXPECT_EQ(it->getCoeff(), 1);  // 2 + (-1)
+    EXPECT_EQ(it->getCoeff(), 1);  
     EXPECT_EQ(it->getDegX(), 0);
 }
 
@@ -149,19 +149,19 @@ TEST(PolynomOperators, PlusEqual) {
 
 TEST(PolynomOperators, MinusSimple) {
     Polynom p1;
-    p1.addMonom(Monom(3, 1, 0, 0)); // 3x
-    p1.addMonom(Monom(2, 0, 0, 0)); // 2
+    p1.addMonom(Monom(3, 1, 0, 0)); 
+    p1.addMonom(Monom(2, 0, 0, 0)); 
 
     Polynom p2;
-    p2.addMonom(Monom(1, 1, 0, 0)); // x
-    p2.addMonom(Monom(5, 0, 0, 0)); // 5
+    p2.addMonom(Monom(1, 1, 0, 0)); 
+    p2.addMonom(Monom(5, 0, 0, 0)); 
 
     Polynom p3 = p1 - p2;
 
     auto it = p3.getMonoms().begin();
-    EXPECT_EQ(it->getCoeff(), 2); // 3x - x
+    EXPECT_EQ(it->getCoeff(), 2); 
     ++it;
-    EXPECT_EQ(it->getCoeff(), -3); // 2 - 5
+    EXPECT_EQ(it->getCoeff(), -3); 
 }
 
 TEST(PolynomOperators, MinusEqual) {
@@ -187,14 +187,13 @@ TEST(PolynomOperators, MinusEqual) {
 
 TEST(PolynomOperators, MultiplyPolynomials) {
     Polynom p1;
-    p1.addMonom(Monom(2, 1, 0, 0)); // 2x
-    p1.addMonom(Monom(3, 0, 0, 0)); // 3
+    p1.addMonom(Monom(2, 1, 0, 0)); 
+    p1.addMonom(Monom(3, 0, 0, 0));
 
     Polynom p2;
-    p2.addMonom(Monom(4, 1, 0, 0)); // 4x
-    p2.addMonom(Monom(1, 0, 0, 0)); // 1
+    p2.addMonom(Monom(4, 1, 0, 0)); 
+    p2.addMonom(Monom(1, 0, 0, 0));
 
-    // (2x + 3)(4x + 1) = 8x^2 + 2x + 12x + 3 = 8x^2 + 14x + 3
     Polynom p3 = p1 * p2;
 
     auto it = p3.getMonoms().begin();
@@ -232,15 +231,15 @@ TEST(PolynomOperators, MultiplyEqualPolynomials) {
 
 TEST(PolynomOperators, MultiplyByScalar) {
     Polynom p;
-    p.addMonom(Monom(3, 2, 0, 0)); // 3x^2
-    p.addMonom(Monom(-1, 0, 0, 0)); // -1
+    p.addMonom(Monom(3, 2, 0, 0)); 
+    p.addMonom(Monom(-1, 0, 0, 0)); 
 
     Polynom r = p * 2.0;
 
     auto it = r.getMonoms().begin();
-    EXPECT_EQ(it->getCoeff(), 6); // 3*2
+    EXPECT_EQ(it->getCoeff(), 6); 
     ++it;
-    EXPECT_EQ(it->getCoeff(), -2); // -1*2
+    EXPECT_EQ(it->getCoeff(), -2); 
 }
 
 TEST(PolynomOperators, MultiplyEqualScalar) {
