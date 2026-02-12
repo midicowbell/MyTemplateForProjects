@@ -6,7 +6,7 @@
 TEST(MonomConstructor, BasicConstructorSetsValuesCorrectly) {
     Monom m(3.5, 2, 1, 0);
 
-    EXPECT_DOUBLE_EQ(m.getCoef(), 3.5);
+    EXPECT_DOUBLE_EQ(m.getCoeff(), 3.5);
     EXPECT_EQ(m.getDegX(), 2);
     EXPECT_EQ(m.getDegY(), 1);
     EXPECT_EQ(m.getDegZ(), 0);
@@ -17,7 +17,7 @@ TEST(MonomConstructor, CopyConstructorCopiesAllFields) {
     Monom original(7.0, 4, 3, 2);
     Monom copy(original);
 
-    EXPECT_DOUBLE_EQ(copy.getCoef(), 7.0);
+    EXPECT_DOUBLE_EQ(copy.getCoeff(), 7.0);
     EXPECT_EQ(copy.getDegX(), 4);
     EXPECT_EQ(copy.getDegY(), 3);
     EXPECT_EQ(copy.getDegZ(), 2);
@@ -65,7 +65,7 @@ TEST(MonomAddition, AddSimilarMonoms) {
 
     Monom c = a + b;
 
-    EXPECT_DOUBLE_EQ(c.getCoef(), 8.0);
+    EXPECT_DOUBLE_EQ(c.getCoeff(), 8.0);
     EXPECT_EQ(c.getDegX(), 2);
     EXPECT_EQ(c.getDegY(), 1);
     EXPECT_EQ(c.getDegZ(), 0);
@@ -85,7 +85,7 @@ TEST(MonomSubtraction, SubtractSimilarMonoms) {
 
     Monom c = a - b;
 
-    EXPECT_DOUBLE_EQ(c.getCoef(), 3.0);
+    EXPECT_DOUBLE_EQ(c.getCoeff(), 3.0);
     EXPECT_EQ(c.getDegX(), 2);
     EXPECT_EQ(c.getDegY(), 1);
     EXPECT_EQ(c.getDegZ(), 0);
@@ -105,7 +105,7 @@ TEST(MonomMultiplication, MultiplyTwoMonoms) {
 
     Monom c = a * b;
 
-    EXPECT_DOUBLE_EQ(c.getCoef(), 12.0); // 3 * 4
+    EXPECT_DOUBLE_EQ(c.getCoeff(), 12.0); // 3 * 4
     EXPECT_EQ(c.getDegX(), 3);           // 2 + 1
     EXPECT_EQ(c.getDegY(), 3);           // 1 + 2
     EXPECT_EQ(c.getDegZ(), 3);           // 0 + 3
@@ -118,7 +118,7 @@ TEST(MonomMultiplication, MultiplyByZeroCoef) {
 
     Monom c = a * b;
 
-    EXPECT_DOUBLE_EQ(c.getCoef(), 0.0);
+    EXPECT_DOUBLE_EQ(c.getCoeff(), 0.0);
     EXPECT_EQ(c.getDegX(), 4);
     EXPECT_EQ(c.getDegY(), 4);
     EXPECT_EQ(c.getDegZ(), 4);
@@ -131,7 +131,7 @@ TEST(MonomMultiplication, MultiplyByOneMonom) {
 
     Monom c = a * b;
 
-    EXPECT_DOUBLE_EQ(c.getCoef(), 7.0);
+    EXPECT_DOUBLE_EQ(c.getCoeff(), 7.0);
     EXPECT_EQ(c.getDegX(), 2);
     EXPECT_EQ(c.getDegY(), 2);
     EXPECT_EQ(c.getDegZ(), 2);
@@ -142,7 +142,7 @@ TEST(MonomDivision, DivideTwoMonoms) {
 
     Monom c = a / b;
 
-    EXPECT_DOUBLE_EQ(c.getCoef(), 4.0); // 12 / 3
+    EXPECT_DOUBLE_EQ(c.getCoeff(), 4.0); // 12 / 3
     EXPECT_EQ(c.getDegX(), 2);          // 3 - 1
     EXPECT_EQ(c.getDegY(), 2);
     EXPECT_EQ(c.getDegZ(), 2);
@@ -170,7 +170,7 @@ TEST(MonomPlusEqual, AddSimilarMonoms) {
 
     a += b;
 
-    EXPECT_DOUBLE_EQ(a.getCoef(), 8.0);
+    EXPECT_DOUBLE_EQ(a.getCoeff(), 8.0);
     EXPECT_EQ(a.getDegX(), 2);
     EXPECT_EQ(a.getDegY(), 1);
     EXPECT_EQ(a.getDegZ(), 0);
@@ -192,7 +192,7 @@ TEST(MonomMinusEqual, SubtractSimilarMonoms) {
 
     a -= b;
 
-    EXPECT_DOUBLE_EQ(a.getCoef(), 3.0);
+    EXPECT_DOUBLE_EQ(a.getCoeff(), 3.0);
     EXPECT_EQ(a.getDegX(), 2);
     EXPECT_EQ(a.getDegY(), 1);
     EXPECT_EQ(a.getDegZ(), 0);
@@ -214,7 +214,7 @@ TEST(MonomMulEqual, MultiplyMonoms) {
 
     a *= b;
 
-    EXPECT_DOUBLE_EQ(a.getCoef(), 12.0);
+    EXPECT_DOUBLE_EQ(a.getCoeff(), 12.0);
     EXPECT_EQ(a.getDegX(), 3);
     EXPECT_EQ(a.getDegY(), 3);
     EXPECT_EQ(a.getDegZ(), 3);
@@ -229,7 +229,7 @@ TEST(MonomDivEqual, DivideMonoms) {
 
     a /= b;
 
-    EXPECT_DOUBLE_EQ(a.getCoef(), 4.0);
+    EXPECT_DOUBLE_EQ(a.getCoeff(), 4.0);
     EXPECT_EQ(a.getDegX(), 2);
     EXPECT_EQ(a.getDegY(), 2);
     EXPECT_EQ(a.getDegZ(), 2);
@@ -299,7 +299,7 @@ TEST(MonomIO, InputOperator) {
     Monom m;
     ss >> m;
 
-    EXPECT_DOUBLE_EQ(m.getCoef(), 4.2);
+    EXPECT_DOUBLE_EQ(m.getCoeff(), 4.2);
     EXPECT_EQ(m.getDegX(), 3);
     EXPECT_EQ(m.getDegY(), 2);
     EXPECT_EQ(m.getDegZ(), 1);
@@ -326,7 +326,7 @@ TEST(MonomPlus, AddSimilar) {
     Monom a(3.0, 2, 1, 0);
     Monom b(5.0, 2, 1, 0);
     Monom c = a + b;
-    EXPECT_DOUBLE_EQ(c.getCoef(), 8.0);
+    EXPECT_DOUBLE_EQ(c.getCoeff(), 8.0);
 }
 
 TEST(MonomPlus, AddDifferentThrows) {
@@ -339,7 +339,7 @@ TEST(MonomPlusEqual, AddSimilar) {
     Monom a(3.0, 2, 1, 0);
     Monom b(5.0, 2, 1, 0);
     a += b;
-    EXPECT_DOUBLE_EQ(a.getCoef(), 8.0);
+    EXPECT_DOUBLE_EQ(a.getCoeff(), 8.0);
 }
 
 TEST(MonomPlusEqual, AddDifferentThrows) {
@@ -352,7 +352,7 @@ TEST(MonomScalarOps, MulScalar) {
 
     Monom r = m * 2.0;
 
-    EXPECT_DOUBLE_EQ(r.getCoef(), 6.0);
+    EXPECT_DOUBLE_EQ(r.getCoeff(), 6.0);
     EXPECT_EQ(r.getDegX(), 2);
     EXPECT_EQ(r.getDegY(), 1);
     EXPECT_EQ(r.getDegZ(), 0);
@@ -363,7 +363,7 @@ TEST(MonomScalarOps, DivScalar) {
 
     Monom r = m / 2.0;
 
-    EXPECT_DOUBLE_EQ(r.getCoef(), 3.0);
+    EXPECT_DOUBLE_EQ(r.getCoeff(), 3.0);
     EXPECT_EQ(r.getDegX(), 2);
     EXPECT_EQ(r.getDegY(), 1);
     EXPECT_EQ(r.getDegZ(), 0);
@@ -380,7 +380,7 @@ TEST(MonomScalarOps, MulScalarInPlace) {
 
     m *= 2.0;
 
-    EXPECT_DOUBLE_EQ(m.getCoef(), 6.0);
+    EXPECT_DOUBLE_EQ(m.getCoeff(), 6.0);
 }
 
 TEST(MonomScalarOps, DivScalarInPlace) {
@@ -388,7 +388,7 @@ TEST(MonomScalarOps, DivScalarInPlace) {
 
     m /= 2.0;
 
-    EXPECT_DOUBLE_EQ(m.getCoef(), 3.0);
+    EXPECT_DOUBLE_EQ(m.getCoeff(), 3.0);
 }
 
 TEST(MonomScalarOps, DivScalarInPlaceThrowsOnZero) {

@@ -54,28 +54,22 @@ Polynom::Polynom(const std::string& s) {
 	}
 }
 void Polynom::addMonom(const Monom& m) {
-	if (m.getCoef() == 0.0)
+	if (m.getCoeff() == 0.0)
 		return;
-
 	int pos = 0;
-
 	for (auto it = monoms.begin(); it != monoms.end(); ++it, ++pos) {
-
-		// одинаковые степени → складываем
 		if (it->getDegX() == m.getDegX() &&
 			it->getDegY() == m.getDegY() &&
 			it->getDegZ() == m.getDegZ()) {
 
 			*it += m;
 
-			if (it->getCoef() == 0.0)
+			if (it->getCoeff() == 0.0)
 				monoms.erase(pos);
 
 			return;
 		}
-
-		// сортировка по степеням
-		if (m > *it) { // если хочешь — замени на свой compare
+		if (m > *it) { 
 			monoms.insert(pos, m);
 			return;
 		}
@@ -83,4 +77,102 @@ void Polynom::addMonom(const Monom& m) {
 
 	monoms.push_back(m);
 }
+Polynom Polynom::operator+(const Polynom& other)  {
+	Polynom result(*this);
+	for (auto it = other.getMonoms().begin(); it != other.getMonoms().begin(); ++it) {
+		result.addMonom(*it);
+	}
+	return result;
+}
+Polynom Polynom::operator-(const Polynom& other)  {
+	Polynom result(*this);
+	for (auto it = other.getMonoms().begin(); it != other.getMonoms().begin(); ++it) {
+		Monom neg = *it;
+		neg.setCoeff(-neg.getCoeff());
+		result.addMonom(neg);
+	}
+	return result;
+}
+Polynom Polynom::operator*(const Polynom& other) {
+	Polynom result;
+	for (auto it1 = this->getMonoms().begin(); it1 != this->getMonoms().begin(); ++it1) {
+		for (auto it2 = other.getMonoms().begin(); it2 != other.getMonoms().end(); ++it2) {
+			Monom m(it1->getCoeff() * it2->getCoeff(), it1->getDegX() + it2->getDegX(), it1->getDegY() + it2->getDegY(), it1->getDegZ() + it2->getDegZ());
+			result.addMonom(m);
+		}
+	}
+	return result;
+}
+Polynom& Polynom::operator*=(const Polynom& other) {
+	for (auto it1 = this->getMonoms().begin(); it1 != this->getMonoms().begin(); ++it1) {
+		for (auto it2 = other.getMonoms().begin(); it2 != other.getMonoms().end(); ++it2) {
+			Monom m(it1->getCoeff() * it2->getCoeff(), it1->getDegX() + it2->getDegX(), it1->getDegY() + it2->getDegY(), it1->getDegZ() + it2->getDegZ());
+			addMonom(m);
+		}
+	}
+	return *this;
+}
+Polynom& Polynom::operator+=(const Polynom& other) {
+	for (auto it = other.getMonoms().begin(); it != other.getMonoms().begin(); ++it) {
+		addMonom(*it);
+	}
+	return *this;
+}
+Polynom& Polynom::operator-=(const Polynom& other) {
+	for (auto it = other.getMonoms().begin(); it != other.getMonoms().begin(); ++it) {
+		Monom neg = *it;
+		neg.setCoeff(-neg.getCoeff());
+		addMonom(neg);
+	}
+	return *this;
+}
+Polynom Polynom::operator/(const Polynom& other)  {
+	throw std::logic_error("Polynomial division is not implemented");
+}
 
+Polynom& Polynom::operator/=(const Polynom& other) {
+	throw std::logic_error("Polynomial division is not implemented");
+}
+Polynom Polynom::operator*(double k) const {
+	Polynom result;
+	for (auto it = this->getMonoms().begin(); it != this->getMonoms().end(); ++it) {
+		Monom m = *it;
+		m.setCoeff(m.getCoeff() * k);
+		result.addMonom(m);
+	}
+	return result;
+}
+Polynom& Polynom::operator*=(double k) {
+	for (auto it = this->getMonoms().begin(); it != this->getMonoms().end(); ++it) {
+		Monom m = *it;
+		m.setCoeff(m.getCoeff() * k);
+		addMonom(m);
+	}
+	return *this;
+}
+Polynom Polynom::operator/(double k) const {
+	if (k == 0) throw std::logic_error("Division by zero");
+	Polynom result;
+	for (auto it = this->getMonoms().begin(); it != this->getMonoms().end(); ++it) {
+		Monom m = *it;
+		m.setCoeff(m.getCoeff() / k);
+		result.addMonom(m);
+	}
+	return result;
+}
+Polynom& Polynom::operator/=(double k) {
+	if (k == 0) throw std::logic_error("Division by zero");
+	for (auto it = this->getMonoms().begin(); it != this->getMonoms().end(); ++it) {
+		Monom m = *it;
+		m.setCoeff(m.getCoeff() / k);
+		addMonom(m);
+	}
+	return *this;
+}
+double Polynom::value(double x, double y, double z) const {
+	double result = 0.0;
+	for (auto it = this->getMonoms().begin(); it != this->getMonoms().end(); ++it) {
+		result += it->value(x, y, z);
+	}
+	return result;
+}

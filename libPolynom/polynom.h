@@ -12,10 +12,10 @@ public:
 	Polynom(const Polynom& other);
 	Polynom(const std::string& str);
 	void addMonom(const Monom& m);
-	Polynom operator+(const Polynom& other) const;
-	Polynom operator-(const Polynom& other) const;
-	Polynom operator*(const Polynom& other) const;
-	Polynom operator/(const Polynom& other) const;
+	Polynom operator+(const Polynom& other) ;
+	Polynom operator-(const Polynom& other) ;
+	Polynom operator*(const Polynom& other) ;
+	Polynom operator/(const Polynom& other) ;
 	Polynom& operator+=(const Polynom& other);
 	Polynom& operator-=(const Polynom& other);
 	Polynom& operator*=(const Polynom& other);
@@ -26,5 +26,4 @@ public:
 	Polynom& operator/=(double k);
 	double value(double x, double y, double z) const;
 	const ListDoubly<Monom>& getMonoms() const { return monoms; }
-
 };

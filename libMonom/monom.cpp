@@ -16,7 +16,7 @@ Monom::Monom(const Monom& other) {
 	coeff = other.coeff;
 }
 bool Monom::operator==(const Monom& other) const {
-	return coeff == other.getCoef() && deg[0] == other.getDegX() && deg[1] == other.getDegY() && deg[2] == other.getDegZ();
+	return coeff == other.getCoeff() && deg[0] == other.getDegX() && deg[1] == other.getDegY() && deg[2] == other.getDegZ();
 
 }
 bool Monom::operator!=(const Monom& other) const {
@@ -26,20 +26,20 @@ Monom Monom::operator+(const Monom& other) const {
 	if (deg[0] != other.getDegX() || deg[1] != other.getDegY() || deg[2] != other.getDegZ()) {
 		throw std::invalid_argument("Cannot add monoms with different degrees");
 	}
-	return Monom(coeff + other.getCoef(), deg[0], deg[1], deg[2]);
+	return Monom(coeff + other.getCoeff(), deg[0], deg[1], deg[2]);
 }
 Monom Monom::operator-(const Monom& other) const {
 	if (deg[0] != other.getDegX() || deg[1] != other.getDegY() || deg[2] != other.getDegZ()) {
 		throw std::invalid_argument("Cannot subtract monoms with different degrees");
 
 	}
-	return Monom(coeff - other.getCoef(), deg[0], deg[1], deg[2]);
+	return Monom(coeff - other.getCoeff(), deg[0], deg[1], deg[2]);
 }
 Monom Monom::operator*(const Monom& other) const {
-	return Monom(coeff * other.getCoef(), deg[0] + other.getDegX(), deg[1] + other.getDegY(), deg[2] + other.getDegZ());
+	return Monom(coeff * other.getCoeff(), deg[0] + other.getDegX(), deg[1] + other.getDegY(), deg[2] + other.getDegZ());
 }
 Monom Monom::operator/(const Monom& other) const {
-	if (other.getCoef() == 0.0) {
+	if (other.getCoeff() == 0.0) {
 		throw std::invalid_argument("Cannot divide by monom with zero coefficient");
 	}
 
@@ -49,39 +49,39 @@ Monom Monom::operator/(const Monom& other) const {
 		throw std::invalid_argument("Resulting monom has negative degree");
 	}
 
-	return Monom(coeff / other.getCoef(),
+	return Monom(coeff / other.getCoeff(),
 		deg[0] - other.getDegX(),
 		deg[1] - other.getDegY(),
 		deg[2] - other.getDegZ());
 }
 Monom& Monom::operator+=(const Monom& other) {
 	if (deg[0] != other.getDegX() || deg[1] != other.getDegY() || deg[2] != other.getDegZ()) { throw std::invalid_argument("Cannot add monoms with different degrees"); }
-	coeff += other.getCoef();
+	coeff += other.getCoeff();
 	return *this;
 }
 Monom& Monom::operator-=(const Monom& other) {
 	if (deg[0] != other.getDegX() || deg[1] != other.getDegY() || deg[2] != other.getDegZ()) { throw std::invalid_argument("Cannot subtract monoms with different degrees"); }
-	coeff -= other.getCoef();
+	coeff -= other.getCoeff();
 	return *this;
 }
 Monom& Monom::operator*=(const Monom& other) {
 	deg[0] += other.getDegX();
 	deg[1] += other.getDegY();
 	deg[2] += other.getDegZ();
-	coeff *= other.getCoef();
+	coeff *= other.getCoeff();
 	return *this;
 }
 Monom& Monom::operator/=(const Monom& other) {
 	deg[0] -= other.getDegX();
 	deg[1] -= other.getDegY();
 	deg[2] -= other.getDegZ();
-	if (other.getCoef() == 0.0) {
+	if (other.getCoeff() == 0.0) {
 		throw std::invalid_argument("Cannot divide by monom with zero coefficient");
 	}
 	if (deg[0] < 0 || deg[1] < 0 || deg[2] < 0) {
 		throw std::invalid_argument("Resulting monom has negative degree");
 	}
-	coeff /= other.getCoef();
+	coeff /= other.getCoeff();
 	return *this;
 }
 Monom& Monom::operator*=(double k) {
@@ -135,5 +135,5 @@ bool Monom::operator>(const Monom& other) const {
 	if (deg[2] != other.getDegZ()) {
 		return deg[2] > other.getDegZ();
 	}
-	return coeff > other.getCoef();
+	return coeff > other.getCoeff();
 }
