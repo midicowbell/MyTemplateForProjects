@@ -17,6 +17,9 @@ public:
 	Tvector() : _size(0), _capacity(0), _data(nullptr) {}
 	Tvector(size_t size) : _size(size), _data(nullptr) {
 		_capacity = calculate_capacity(_size);
+		if (_capacity > 0) {
+			_data = new T[_capacity]();
+		}
 	}
 	Tvector(const Tvector& other) : _size(other._size), _capacity(other._capacity), _data(nullptr) {
 		if (_capacity > 0) {
@@ -48,14 +51,14 @@ public:
 	
 	void push_back(T val) {
 		if (_size == _capacity) {
-			reserve(_size + 1);
+			reserve(calculate_capacity(_size + 1));
 		}
 			_data[_size] = val;
 			_size++;
 	}
 	void push_front(T val) {
 		if (_size == _capacity) {
-			reserve(_size + 1);
+			reserve(calculate_capacity(_size + 1));
 		}
 		for (int i = _size; i > 0; i--) {
 			_data[i] = _data[i - 1];
@@ -85,29 +88,36 @@ public:
 
 	void reserve(size_t new_capacity) {
 		if (new_capacity <= _capacity) {
-			T* new_data = new T[new_capacity];
+			return;
+		}
+
+		T* new_data = new T[new_capacity];
+		for (size_t i = 0; i < _size; i++) {
+			new_data[i] = _data[i];
+		}
+		delete[] _data;
+		_data = new_data;
+		_capacity = new_capacity;
+	}
+	void shrink_to_fit() {
+		if (_capacity == _size) return;
+		T* new_data = nullptr;
+		if (_size > 0) {
+			new_data = new T[_size];
 			for (size_t i = 0; i < _size; i++) {
 				new_data[i] = _data[i];
 			}
-			delete[] _data;
-			_data = new_data;
-			_capacity = new_capacity;
 		}
-		else {
-			T* new_data = new T[new_capacity];
-			for (size_t i = 0; i < _size; i++) {
-				new_data[i] = _data[i];
-			}
-			delete[] _data;
-			_data = new_data;
-			_capacity = new_capacity;
-		}
+
+		delete[] _data;
+		_data = new_data;
+		_capacity = _size;
 	}
 
 	void insert(size_t pos, const T& val) {
 		if (pos > _size) throw std::out_of_range("Index out of range");
 		if (_size == _capacity) {
-			reserve(calculate_capacity(_size));
+			reserve(calculate_capacity(_size + 1));
 		}
 		for (size_t i = _size; i > pos; i--) {
 			_data[i] = _data[i - 1];
@@ -124,7 +134,7 @@ public:
 		--_size;
 	}
 
-	void erase(size_t pos, size_t lenght) {
+	void erase(size_t pos, size_t lenght = 0) {
 		if (pos > _size) throw std::out_of_range("Index out of range");
 		for (size_t i = pos; i < _size - lenght; i++) {
 				_data[i] = _data[i + lenght];
@@ -132,11 +142,8 @@ public:
 		_size = _size - lenght;
 	}
 
-	bool empty() {
-		if (_data == nullptr) {
-			return true;
-		}
-		return false;
+	bool empty() const noexcept {
+		return _size == 0;
 	}
 
 	void pop_back() {
