@@ -8,9 +8,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include_directories(lib)
 include_directories(libTvector) # Исправил регистр v
 include_directories(libUnsortedTableOnVec)
+include_directories(lib_list)
+include_directories(libSortedTableOnVec)
+include_directories(libUnsortedTableOnList)
 
 add_subdirectory(libITable)
 add_subdirectory(libUnsortedTableOnVec)
+add_subdirectory(libSortedTableOnVec)
+add_subdirectory(libUnsortedTableOnList)
 add_subdirectory(src)
 
 option(BUILD_TESTS "Build unit tests?" ON)

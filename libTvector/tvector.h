@@ -6,7 +6,6 @@ int calculate_capacity(size_t size) {
 	return (size + STEP_CAPACITY) / STEP_CAPACITY * STEP_CAPACITY;
 }
 
-
 template <class T>
 class Tvector {
 protected:
@@ -15,12 +14,14 @@ protected:
 	T* _data;
 public:
 	Tvector() : _size(0), _capacity(0), _data(nullptr) {}
+	
 	Tvector(size_t size) : _size(size), _data(nullptr) {
 		_capacity = calculate_capacity(_size);
 		if (_capacity > 0) {
 			_data = new T[_capacity]();
 		}
 	}
+	
 	Tvector(const Tvector& other) : _size(other._size), _capacity(other._capacity), _data(nullptr) {
 		if (_capacity > 0) {
 			_data = new T[_capacity];
@@ -29,23 +30,25 @@ public:
 			}
 		}
 	}
-	Tvector(const T* arr, size_t n): _size(n), _capacity(calculate_capacity(_size)), _data(nullptr) {
+	
+	Tvector(const T* arr, size_t n) : _size(n), _capacity(calculate_capacity(_size)), _data(nullptr) {
 		if (n > 0) {
 			if (arr == nullptr) {
 				throw std::logic_error("arr is empty, but n > 0, wayd");
 			}
 			_data = new T[_capacity];
-			for (int i = 0; i < _size; i++) {
+			for (size_t i = 0; i < _size; i++) {
 				_data[i] = arr[i];
 			}
 		}
 	}
+	
 	Tvector(std::initializer_list<T> data) {
 		_size = data.size();
 		_capacity = calculate_capacity(_size);
 		_data = new T[_capacity];
-		for (int i = 0; i < _size; i++) {
-			_data[i] = *(data.begin() + i); // здесь data.begin() возрващает адрес, поэтому нужно будет его разыменовать, дабы получить элемент, который находится по этому адресу
+		for (size_t i = 0; i < _size; i++) {
+			_data[i] = *(data.begin() + i);
 		}
 	}
 	
@@ -53,23 +56,25 @@ public:
 		if (_size == _capacity) {
 			reserve(calculate_capacity(_size + 1));
 		}
-			_data[_size] = val;
-			_size++;
+		_data[_size] = val;
+		_size++;
 	}
+	
 	void push_front(T val) {
 		if (_size == _capacity) {
 			reserve(calculate_capacity(_size + 1));
 		}
-		for (int i = _size; i > 0; i--) {
+		for (size_t i = _size; i > 0; i--) {
 			_data[i] = _data[i - 1];
 		}
 		_data[0] = val;
 		_size++;
 	}
+	
 	void print() {
 		if (_data != nullptr) {
 			std::cout << "[";
-			for (int i = 0; i < _size; i++) {
+			for (size_t i = 0; i < _size; i++) {
 				if (i > 0) {
 					std::cout << ", ";
 				}
@@ -99,6 +104,7 @@ public:
 		_data = new_data;
 		_capacity = new_capacity;
 	}
+	
 	void shrink_to_fit() {
 		if (_capacity == _size) return;
 		T* new_data = nullptr;
@@ -127,19 +133,21 @@ public:
 	}
 
 	void pop(size_t pos) {
-		if (pos > _size) throw std::out_of_range("Index out of range");
+		if (pos >= _size) throw std::out_of_range("Index out of range");
 		for (size_t i = pos; i < _size - 1; i++) {
 			_data[i] = _data[i + 1];
 		}
 		--_size;
 	}
 
-	void erase(size_t pos, size_t lenght = 0) {
-		if (pos > _size) throw std::out_of_range("Index out of range");
-		for (size_t i = pos; i < _size - lenght; i++) {
-				_data[i] = _data[i + lenght];
-			}
-		_size = _size - lenght;
+	void erase(size_t pos, size_t length = 1) {
+		if (pos >= _size) throw std::out_of_range("Index out of range");
+		if (pos + length > _size) length = _size - pos;
+		
+		for (size_t i = pos; i < _size - length; i++) {
+			_data[i] = _data[i + length];
+		}
+		_size = _size - length;
 	}
 
 	bool empty() const noexcept {
@@ -156,7 +164,8 @@ public:
 		}
 		throw std::logic_error("Val not in data");
 	}
-	size_t find_last(const T &val) const {
+	
+	size_t find_last(const T& val) const {
 		for (size_t i = _size; i > 0; i--) {
 			if (_data[i - 1] == val) { return i - 1; }
 		}
@@ -193,7 +202,7 @@ public:
 		vec.resize(count);
 
 		std::cout << "Enter the elements:\n";
-		for (int i = 0; i < vec.size(); i++) {
+		for (size_t i = 0; i < vec.size(); i++) {
 			is >> vec[i];
 		}
 		return is;
@@ -217,18 +226,24 @@ public:
 		}
 		return *this;
 	}
-	inline T&operator[](int indx) noexcept {
+	
+	// ??????????: ?????? ????????? ?????????? size_t
+	inline T& operator[](size_t indx) noexcept {
 		return _data[indx];
 	}
-	inline const T& operator[](int indx) const noexcept {
+	
+	inline const T& operator[](size_t indx) const noexcept {
 		return _data[indx];
 	}
+	
 	inline size_t size() const noexcept {
 		return _size;
 	}
+	
 	inline size_t capacity() const noexcept {
 		return _capacity;
 	}
+	
 	inline T* data() const noexcept {
 		return _data;
 	}
@@ -236,5 +251,4 @@ public:
 	~Tvector() {
 		delete[] _data;
 	}
-	
 };
