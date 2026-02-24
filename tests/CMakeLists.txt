@@ -17,7 +17,6 @@ target_link_libraries(tests
 )
 
 # 3. Подсказываем, где искать хедеры (на уровень выше, чтобы видеть libTvector и т.д.)
-target_include_directories(tests PRIVATE ..)
 
 # 4. Регистрация теста в системе
 add_test(NAME all_tests COMMAND tests)

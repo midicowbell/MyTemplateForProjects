@@ -4,6 +4,6 @@ add_executable(my_app
 
 target_link_libraries(my_app
     PRIVATE
-        monom
-        polynom
+    dsu
+    algos
 )
