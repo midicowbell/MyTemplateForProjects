@@ -25,7 +25,7 @@ option(BUILD_TESTS "Build unit tests?" ON)
 if(BUILD_TESTS)
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     # Важно: путь должен совпадать с папкой на диске
-    add_subdirectory(third_party/gtest EXCLUDE_FROM_ALL)
+    add_subdirectory(third_party/googletest EXCLUDE_FROM_ALL)
 
     enable_testing()
     add_subdirectory(tests) # Идет в папку tests и ищет там CMakeLists.txt
