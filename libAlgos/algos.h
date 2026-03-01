@@ -54,7 +54,7 @@ std::vector<std::vector<bool>> generate(int entranceX, int entranceY, int height
         maze[0][2 * entranceX + 1] = false; 
     }
 
-    if (entranceY >= 0 && entranceY < width) {
+    if (entranceY >= 0 && entranceY < height) {
         maze[2 * height][2 * entranceY + 1] = false;
     }
 
