@@ -28,10 +28,10 @@ public:
         }
         _rows.push_back({ key, value });
     }
-    Tvalue& find(const Tkey& key) const override {
+    Tvalue& find(const Tkey& key) override {
         for (size_t i = 0; i < _rows.size(); i++) {
             if (_rows[i].first == key) {
-                return const_cast<Tvalue&>(_rows[i].second);
+                return _rows[i].second;
             }
         }
         throw std::out_of_range("Key not found");

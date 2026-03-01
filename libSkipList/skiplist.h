@@ -83,31 +83,6 @@ public:
 			update[lvl]->forward[lvl] = newNode;
 		}
 	}
-	bool remove(const Tkey& key) {
-		Node<Tkey, Tvalue>* curr = head;
-		std::vector<Node<Tkey, Tvalue>*> update(maxLvl, nullptr);
-		for (int lvl = currLvl - 1; lvl >= 0; lvl--) {
-			while (curr->forward[lvl] && curr->forward[lvl]->_data.first < key) {
-				curr = curr->forward[lvl];
-			}
-			update[lvl] = curr;
-		}
-		curr = curr->forward[0];
-		if (!curr || curr->_data.first != key) {
-			return false;
-		}
-		for (int lvl = 0; lvl < currLvl; lvl++) {
-			if (update[lvl]->forward[lvl] != curr) {
-				break;
-			}
-			update[lvl]->forward[lvl] = curr->forward[lvl];
-		}
-		while (currLvl > 1 && !head->forward[currLvl - 1]) {
-			currLvl--;
-		}
-		delete curr;
-		return true;
-	}
 	void print() const {
 		for (int lvl = currLvl - 1; lvl >= 0; lvl--) {
 			std::cout << "level " << lvl << ": ";

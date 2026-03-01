@@ -4,6 +4,7 @@
 #include "unsortedTableOnList.h"
 #include <string>
 #include <ostream>
+#include "skiplist.h"
 
 // Тест 1: Вставка и поиск
 TEST(UnsortedTableTest, InsertAndFind) {
@@ -264,5 +265,121 @@ TEST(UnsortedTableOnListTest, PrintDoesNotCrash) {
     std::ostringstream os;
     EXPECT_NO_THROW(t.print(os));
 }
+TEST(SkipListTest, InsertAndFind) {
+    std::srand(42);
+    SkipList<int, int> list(5);
+
+    list.insert(5, 50);
+    list.insert(1, 10);
+    list.insert(3, 30);
+
+    EXPECT_NE(list.find(1), nullptr);
+    EXPECT_NE(list.find(3), nullptr);
+    EXPECT_NE(list.find(5), nullptr);
+    EXPECT_EQ(list.find(1)->_data.second, 10);
+    EXPECT_EQ(list.find(3)->_data.second, 30);
+    EXPECT_EQ(list.find(5)->_data.second, 50);
+}
+
+TEST(SkipListTest, FindNonExistent) {
+    std::srand(42);
+    SkipList<int, int> list(5);
+
+    list.insert(1, 10);
+    list.insert(3, 30);
+
+    EXPECT_EQ(list.find(2), nullptr);
+    EXPECT_EQ(list.find(99), nullptr);
+}
+
+TEST(SkipListTest, EmptyList) {
+    std::srand(42);
+    SkipList<int, int> list(5);
+
+    EXPECT_EQ(list.find(1), nullptr);
+}
 
 
+TEST(SkipListTest, UpdateExistingKey) {
+    std::srand(42);
+    SkipList<int, int> list(5);
+
+    list.insert(1, 100);
+    EXPECT_EQ(list.find(1)->_data.second, 100);
+
+    list.insert(1, 200);
+    EXPECT_EQ(list.find(1)->_data.second, 200);
+}
+
+TEST(SkipListTest, StringKeys) {
+    std::srand(42);
+    SkipList<std::string, int> list(5);
+
+    list.insert("apple", 10);
+    list.insert("banana", 20);
+
+    EXPECT_EQ(list.find("apple")->_data.second, 10);
+    EXPECT_EQ(list.find("banana")->_data.second, 20);
+}
+
+TEST(SkipListTest, StringValues) {
+    std::srand(42);
+    SkipList<int, std::string> list(5);
+
+    list.insert(1, "one");
+    list.insert(2, "two");
+
+    EXPECT_EQ(list.find(1)->_data.second, "one");
+    EXPECT_EQ(list.find(2)->_data.second, "two");
+}
+
+TEST(SkipListTest, NegativeKeys) {
+    std::srand(42);
+    SkipList<int, int> list(5);
+
+    list.insert(-5, -50);
+    list.insert(0, 0);
+    list.insert(5, 50);
+
+    EXPECT_EQ(list.find(-5)->_data.second, -50);
+    EXPECT_EQ(list.find(0)->_data.second, 0);
+    EXPECT_EQ(list.find(5)->_data.second, 50);
+}
+
+TEST(SkipListTest, Stress100Elements) {
+    std::srand(42);
+    SkipList<int, int> list(10);
+
+    for (int i = 0; i < 100; ++i) {
+        list.insert(i, i * 10);
+    }
+
+    for (int i = 0; i < 100; ++i) {
+        EXPECT_NE(list.find(i), nullptr);
+        EXPECT_EQ(list.find(i)->_data.second, i * 10);
+    }
+}
+
+TEST(SkipListTest, DestructorEmpty) {
+    SkipList<int, int> list(5);
+}
+
+TEST(SkipListTest, DestructorFilled) {
+    std::srand(42);
+    {
+        SkipList<int, int> list(5);
+        for (int i = 0; i < 50; ++i) {
+            list.insert(i, i);
+        }
+    }
+}
+
+TEST(SkipListTest, PrintDoesNotCrash) {
+    std::srand(42);
+    SkipList<int, int> list(5);
+
+    list.insert(1, 10);
+    list.insert(2, 20);
+
+    EXPECT_NO_THROW(list.print());
+}

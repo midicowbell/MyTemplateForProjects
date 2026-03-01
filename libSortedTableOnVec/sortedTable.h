@@ -11,7 +11,7 @@ private:
 public:
 	SortedTableOnVec() {}
 	virtual ~SortedTableOnVec() = default;
-	size_t binary_search(const Tkey& key) {
+	size_t binary_search(const Tkey& key) const {
 		size_t left = 0;
 		size_t right = _rows.size();
 		while (left < right) {
@@ -25,51 +25,36 @@ public:
 		return left;
 	}
 	void insert(const Tkey& key, const Tvalue& value) override {
-		if (consist(key)) { throw std::logic_error("Key already exists"); }
-		size_t pos =  binary_search(key);
-		_rows.insert(static_cast<int>(pos), { key, value });
-
+		size_t pos = binary_search(key);
+		if (pos < _rows.size() && _rows[pos].first == key)
+			throw std::logic_error("Key already exists");
+		_rows.insert(pos, { key, value });	
 	}
+
 	void replace(const Tkey& key, const Tvalue& value) override {
-		for (size_t i = 0; i < _rows.size(); i++) {
-			if (_rows[i].first == key) {
-				_rows[i].second = value;
-				return;
-			}
-		}
-		insert(key, value);
-
+		size_t pos = binary_search(key);
+		if (pos < _rows.size() && _rows[pos].first == key)
+			_rows[pos].second = value;
+		else
+			_rows.insert(static_cast<int>(pos), { key, value });
 	}
+
 	bool consist(const Tkey& key) const noexcept override {
-		size_t left = 0;
-		size_t right = _rows.size();
-		while (left < right) {
-			size_t mid = left + (right - left) / 2;
-			if (_rows[mid].first == key) { return true; }
-			else if (_rows[mid].first < key) { left = mid + 1; }
-			else { right = mid; }
-		}
-		return false;
+		size_t pos = binary_search(key);
+		return pos < _rows.size() && _rows[pos].first == key;
 	}
-	Tvalue& find(const Tkey& key) const override {
-		size_t left = 0;
-		size_t right = _rows.size();
-		while (left < right) {
-			size_t mid = left + (right - left) / 2;
-			if (_rows[mid].first == key) { return const_cast<Tvalue&>(_rows[mid].second); }
-			else if (_rows[mid].first < key) { left = mid + 1; }
-			else { right = mid; }
 
-		}
-		throw std::out_of_range("Key not found");
+	Tvalue& find(const Tkey& key) override {
+		size_t pos = binary_search(key);
+		if (pos == _rows.size() || _rows[pos].first != key)
+			throw std::out_of_range("Key not found");
+		return _rows[pos].second;
 	}
+
 	void erase(const Tkey& key) override {
-		for (size_t i = 0; i < _rows.size(); i++) {
-			if (_rows[i].first == key) {
-				_rows.erase(i, 1);
-				return;
-			}
-		}
+		size_t pos = binary_search(key);
+		if (pos < _rows.size() && _rows[pos].first == key)
+			_rows.erase(pos, 1);
 	}
 	bool is_empty() const noexcept override {
 		return _rows.empty();
