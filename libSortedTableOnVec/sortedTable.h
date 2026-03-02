@@ -36,7 +36,7 @@ public:
 		if (pos < _rows.size() && _rows[pos].first == key)
 			_rows[pos].second = value;
 		else
-			_rows.insert(static_cast<int>(pos), { key, value });
+			_rows.insert(pos, { key, value });
 	}
 
 	bool consist(const Tkey& key) const noexcept override {
