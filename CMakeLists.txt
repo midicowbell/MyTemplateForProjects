@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 project(MyProject)
 include_directories(lib)
-
+include_directories(libTree)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -10,8 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include(cmake/functions.cmake OPTIONAL)
 
 # библиотеки
-add_subdirectory(libMonom)
-add_subdirectory(libPolynom)
+add_subdirectory(libTree)
 
 # основной исполняемый файл
 add_subdirectory(src)

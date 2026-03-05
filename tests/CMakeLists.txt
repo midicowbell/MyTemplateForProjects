@@ -1,12 +1,10 @@
 add_executable(tests
-    test_monom.cpp
-    test_polynom.cpp
+    test_example.cpp
+    tree.cpp
 )
 
 target_link_libraries(tests
     PRIVATE
-        monom
-        polynom
         gtest
         gtest_main
 )
