@@ -2,10 +2,16 @@
 #include <iostream>
 #include <stdexcept>
 #include <cmath>
+
 class Monom {
 private:
 	int deg[3];
 	double coeff;
+
+	bool hasSameDegrees(const Monom& other) const;
+	bool hasNegativeDegrees() const;
+	bool isValidDivision(const Monom& other) const;
+
 public:
 	Monom(const Monom& other);
 	Monom(double coeff, int degX, int degY, int degZ);
@@ -17,6 +23,7 @@ public:
 	void setCoeff(double k) { coeff = k; }
 	bool operator==(const Monom& other) const;
 	bool operator!=(const Monom& other) const;
+	bool operator>(const Monom& other) const;
 	Monom operator+(const Monom& other) const;
 	Monom operator-(const Monom& other) const;
 	Monom operator*(const Monom& other) const;
@@ -25,7 +32,6 @@ public:
 	Monom& operator-=(const Monom& other);
 	Monom& operator*=(const Monom& other);
 	Monom& operator/=(const Monom& other);
-	bool operator>(const Monom& other) const;
 	Monom operator*(double k) const;
 	Monom operator/(double k) const;
 	Monom& operator*=(double k);
@@ -34,8 +40,4 @@ public:
 	double value(double x, double y, double z) const;
 	friend std::ostream& operator<<(std::ostream& os, const Monom& m);
 	friend std::istream& operator>>(std::istream& is, Monom& m);
-
-
-
-
 };

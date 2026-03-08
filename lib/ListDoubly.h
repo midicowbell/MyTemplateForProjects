@@ -12,7 +12,9 @@ private:
         Node<U>* next;
         Node<U>* prev;
 
-        Node(U val, Node<U>* nxt = nullptr, Node<U>* pre = nullptr) : value(val), next(nxt), prev(pre) {}
+        Node(U val, Node<U>* nxt = nullptr, Node<U>* pre = nullptr)
+            : value(val), next(nxt), prev(pre) {
+        }
     };
 
     Node<T>* _head;
@@ -45,9 +47,14 @@ public:
             current = other.current;
             return *this;
         }
+
         T* operator->() {
+            if (current == nullptr) {
+                throw std::logic_error("Dereferencing nullptr iterator");
+            }
             return &current->value;
         }
+
         bool operator==(const Iterator& other) const {
             return current == other.current;
         }
@@ -59,26 +66,40 @@ public:
             return current->value;
         }
 
-        bool operator!=(const Iterator& other) {
+        bool operator!=(const Iterator& other) const {
             return current != other.current;
         }
 
         Iterator operator++(int) {
+            if (current == nullptr) {
+                throw std::logic_error("Incrementing end iterator");
+            }
             Iterator temp = *this;
             current = current->next;
             return temp;
         }
+
         Iterator operator--(int) {
+            if (current == nullptr) {
+                throw std::logic_error("Decrementing end iterator");
+            }
             Iterator temp = *this;
             current = current->prev;
             return temp;
         }
 
         Iterator& operator++() {
+            if (current == nullptr) {
+                throw std::logic_error("Incrementing end iterator");
+            }
             current = current->next;
             return *this;
         }
+
         Iterator& operator--() {
+            if (current == nullptr) {
+                throw std::logic_error("Decrementing end iterator");
+            }
             current = current->prev;
             return *this;
         }
@@ -86,11 +107,30 @@ public:
 
     typedef Iterator iterator;
 
-    ListDoubly() : _head(nullptr), _tail(nullptr), _count(0) {};
-
+    ListDoubly() : _head(nullptr), _tail(nullptr), _count(0) {}
 
     ~ListDoubly() {
         clear();
+    }
+
+    ListDoubly(const ListDoubly<T>& other) : _head(nullptr), _tail(nullptr), _count(0) {
+        Node<T>* current = other._head;
+        while (current != nullptr) {
+            push_back(current->value);
+            current = current->next;
+        }
+    }
+
+    ListDoubly<T>& operator=(const ListDoubly<T>& other) {
+        if (this != &other) {
+            clear();
+            Node<T>* current = other._head;
+            while (current != nullptr) {
+                push_back(current->value);
+                current = current->next;
+            }
+        }
+        return *this;
     }
 
     Iterator begin() {
@@ -100,13 +140,15 @@ public:
     Iterator end() {
         return Iterator(nullptr);
     }
-    Iterator begin()const {
+
+    Iterator begin() const {
         return Iterator(_head);
     }
 
-    Iterator end()const {
+    Iterator end() const {
         return Iterator(nullptr);
     }
+
 
     void push_front(const T& val) {
         Node<T>* new_node = new Node<T>(val, _head);
@@ -179,6 +221,9 @@ public:
         if (_head == nullptr) {
             _tail = nullptr;
         }
+        else {
+            _head->prev = nullptr; 
+        }
 
         delete temp;
         _count--;
@@ -194,13 +239,23 @@ public:
             _head = _tail = nullptr;
         }
         else {
+            Node<T>* temp = _tail; 
             _tail = _tail->prev;
-            delete _tail->next;
-            _tail->next = nullptr;
+            delete temp; 
+            if (_tail != nullptr) {
+                _tail->next = nullptr;
+            }
         }
         _count--;
     }
-    void erase(Iterator it);
+
+    void erase(Iterator it) {
+        if (it == end()) {
+            throw std::logic_error("Cannot erase end iterator");
+        }
+        erase(it.current);
+    }
+
     void erase(int pos) {
         if (is_empty()) {
             throw std::logic_error("Cannot erase from empty list");
@@ -213,12 +268,13 @@ public:
         if (pos == 0) {
             pop_front();
         }
-        else if (pos == _count - 1) { pop_back(); }
+        else if (pos == _count - 1) {
+            pop_back();
+        }
         else {
             Node<T>* curr = get_node_at(pos);
             erase(curr);
         }
-
     }
 
     void erase(Node<T>* node) {
@@ -233,8 +289,12 @@ public:
             pop_back();
         }
         else {
-            node->next->prev = node->prev;
-            node->prev->next = node->next;
+            if (node->next != nullptr) {
+                node->next->prev = node->prev;
+            }
+            if (node->prev != nullptr) {
+                node->prev->next = node->next;
+            }
             delete node;
             _count--;
         }
@@ -247,7 +307,6 @@ public:
     int size() const {
         return _count;
     }
-
     Node<T>* find(const T& val) {
         Node<T>* current = _head;
         while (current != nullptr) {
@@ -269,14 +328,9 @@ public:
         }
         return nullptr;
     }
-
     void clear() {
         while (!is_empty()) {
             pop_front();
         }
     }
 };
-template<typename T>
-void ListDoubly<T>::erase(Iterator it) {
-    erase(it.current);
-}
