@@ -10,8 +10,19 @@ class UnsortedTableOnVec : public Itable<Tkey, Tvalue> {
 private:
     Tvector<std::pair<Tkey, Tvalue>> _rows;
 
+    // Вспомогательный метод для поиска индекса (используется несколько раз)
+    // Возвращает индекс элемента с заданным ключом или -1 если не найден
+    int _findIndex(const Tkey& key) const noexcept {
+        for (size_t i = 0; i < _rows.size(); i++) {
+            if (_rows[i].first == key) {
+                return static_cast<int>(i);
+            }
+        }
+        return -1;
+    }
+
 public:
-    UnsortedTableOnVec() {}
+    UnsortedTableOnVec() = default;
     virtual ~UnsortedTableOnVec() = default;
     void insert(const Tkey& key, const Tvalue& value) override {
         if (consist(key)) {
@@ -19,37 +30,36 @@ public:
         }
         _rows.push_back({ key, value });
     }
+
     void replace(const Tkey& key, const Tvalue& value) override {
-        for (size_t i = 0; i < _rows.size(); i++) {
-            if (_rows[i].first == key) {
-                _rows[i].second = value;
-                return;
-            }
+        int idx = _findIndex(key);
+        if (idx != -1) {
+            _rows[idx].second = value;
         }
-        _rows.push_back({ key, value });
+        else {
+            _rows.push_back({ key, value });
+        }
     }
+
     Tvalue& find(const Tkey& key) override {
-        for (size_t i = 0; i < _rows.size(); i++) {
-            if (_rows[i].first == key) {
-                return _rows[i].second;
-            }
+        int idx = _findIndex(key);
+        if (idx != -1) {
+            return _rows[idx].second;
         }
         throw std::out_of_range("Key not found");
     }
+
     void erase(const Tkey& key) override {
-        for (size_t i = 0; i < _rows.size(); i++) {
-            if (_rows[i].first == key) {
-                _rows.erase(i, 1);
-                return;
-            }
+        int idx = _findIndex(key);
+        if (idx != -1) {
+            _rows.erase(static_cast<size_t>(idx), 1);
         }
     }
+
     bool consist(const Tkey& key) const noexcept override {
-        for (size_t i = 0; i < _rows.size(); i++) {
-            if (_rows[i].first == key) { return true; }
-        }
-        return false;
+        return _findIndex(key) != -1;
     }
+
     bool is_empty() const noexcept override {
         return _rows.empty();
     }
@@ -57,6 +67,7 @@ public:
     size_t size() const noexcept {
         return _rows.size();
     }
+
     std::ostream& print(std::ostream& os) const noexcept override {
         for (size_t i = 0; i < _rows.size(); i++) {
             os << "|" << _rows[i].first << " | " << _rows[i].second << "|" << std::endl;

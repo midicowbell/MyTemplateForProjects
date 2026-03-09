@@ -4,43 +4,60 @@
 #include <utility>
 #include "../libITable/itable.h"
 #include "list.h"
+
 template<typename Tkey, typename Tvalue>
 class UnsortedTableOnList : public Itable<Tkey, Tvalue> {
 private:
 	List<std::pair<Tkey, Tvalue>> _list;
+
+	// Вспомогательный метод для поиска элемента
+	// Возвращает iterator на найденный элемент или end() если не найден
+	auto _findIterator(const Tkey& key) const noexcept {
+		for (auto it = _list.begin(); it != _list.end(); ++it) {
+			if ((*it).first == key) {
+				return it;
+			}
+		}
+		return _list.end();
+	}
+
 public:
-	UnsortedTableOnList() {}
-	~UnsortedTableOnList() {}
+	UnsortedTableOnList() = default;
+	~UnsortedTableOnList() = default;
+
 	bool consist(const Tkey& key) const noexcept override {
-		for (auto it = _list.begin(); it != _list.end(); ++it) {
-			if ((*it).first == key) { return true; }
-		}
-		return false;
+		return _findIterator(key) != _list.end();
 	}
+
 	void insert(const Tkey& key, const Tvalue& value) override {
-		if(consist(key)) { throw std::logic_error("Key already exists"); }
-		_list.push_back({ key ,value });
+		if (consist(key)) {
+			throw std::logic_error("Key already exists");
+		}
+		_list.push_back({ key, value });
 	}
+
 	void replace(const Tkey& key, const Tvalue& value) override {
-		for (auto it = _list.begin(); it != _list.end(); ++it) {
-			if ((*it).first == key) {
-				(*it).second = value;
-				return;
-			}
+		auto it = _findIterator(key);
+		if (it != _list.end()) {
+			(*it).second = value;
 		}
-		insert(key, value);
+		else {
+			insert(key, value);
+		}
 	}
+
 	Tvalue& find(const Tkey& key) override {
-		for (auto it = _list.begin(); it != _list.end(); ++it) {
-			if ((*it).first == key) {
-				return (*it).second;
-			}
+		auto it = _findIterator(key);
+		if (it != _list.end()) {
+			return (*it).second;
 		}
-		throw std::logic_error("Key not found"); 
+		throw std::out_of_range("Key not found");
 	}
+
 	bool is_empty() const noexcept override {
 		return _list.is_empty();
 	}
+
 	void erase(const Tkey& key) override {
 		int pos = 0;
 		for (auto it = _list.begin(); it != _list.end(); ++it, ++pos) {
@@ -49,8 +66,8 @@ public:
 				return;
 			}
 		}
-
 	}
+
 	std::ostream& print(std::ostream& os) const noexcept override {
 		for (auto it = _list.begin(); it != _list.end(); ++it) {
 			os << "|" << (*it).first << "|" << (*it).second << "|\n";

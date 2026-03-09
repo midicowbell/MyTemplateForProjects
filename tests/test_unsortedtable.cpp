@@ -6,7 +6,7 @@
 #include <ostream>
 #include "skiplist.h"
 
-// Тест 1: Вставка и поиск
+//Вставка и поиск
 TEST(UnsortedTableTest, InsertAndFind) {
     UnsortedTableOnVec<std::string, int> table;
 
@@ -18,7 +18,7 @@ TEST(UnsortedTableTest, InsertAndFind) {
     EXPECT_EQ(table.size(), 2);
 }
 
-// Тест 2: Проверка на наличие ключа
+//Проверка на наличие ключа
 TEST(UnsortedTableTest, Consist) {
     UnsortedTableOnVec<int, std::string> table;
 
@@ -28,7 +28,7 @@ TEST(UnsortedTableTest, Consist) {
     EXPECT_FALSE(table.consist(2));
 }
 
-// Тест 3: Замена существующего значения
+// Замена существующего значения
 TEST(UnsortedTableTest, ReplaceExisting) {
     UnsortedTableOnVec<std::string, int> table;
 
@@ -38,7 +38,7 @@ TEST(UnsortedTableTest, ReplaceExisting) {
     EXPECT_EQ(table.find("power"), 9001);
 }
 
-// Тест 4: Удаление элемента
+// Удаление элемента
 TEST(UnsortedTableTest, EraseElement) {
     UnsortedTableOnVec<int, int> table;
 
@@ -51,7 +51,7 @@ TEST(UnsortedTableTest, EraseElement) {
     EXPECT_EQ(table.size(), 1);
 }
 
-// Тест 5: Исключение при поиске несуществующего ключа
+// Исключение при поиске несуществующего ключа
 TEST(UnsortedTableTest, FindNonExistentThrows) {
     UnsortedTableOnVec<int, int> table;
 
@@ -60,7 +60,7 @@ TEST(UnsortedTableTest, FindNonExistentThrows) {
     EXPECT_THROW(table.find(99), std::out_of_range);
 }
 
-// Тест 6: Запрет на вставку дубликатов ключей
+// Запрет на вставку дубликатов ключей
 TEST(UnsortedTableTest, InsertDuplicateThrows) {
     UnsortedTableOnVec<std::string, int> table;
 
@@ -127,7 +127,7 @@ TEST(SortedTableOnVecTest, EraseNonExistingDoesNothing) {
     SortedTableOnVec<int, std::string> t;
     t.insert(1, "one");
 
-    t.erase(999); // не должно упасть
+    t.erase(999);
 
     EXPECT_EQ(t.size(), 1);
     EXPECT_TRUE(t.consist(1));
@@ -160,7 +160,7 @@ TEST(SortedTableOnVecTest, BinarySearchCorrectPositions) {
     EXPECT_EQ(t.binary_search(35), 3);
 }
 
-// Тест: вставка и поиск
+//  вставка и поиск
 TEST(UnsortedTableOnListTest, InsertAndFind) {
     UnsortedTableOnList<int, std::string> t;
 
@@ -173,7 +173,7 @@ TEST(UnsortedTableOnListTest, InsertAndFind) {
     EXPECT_EQ(t.find(20), "twenty");
 }
 
-// Тест: вставка дубликата
+// вставка дубликата
 TEST(UnsortedTableOnListTest, InsertDuplicateThrows) {
     UnsortedTableOnList<int, std::string> t;
 
@@ -181,7 +181,7 @@ TEST(UnsortedTableOnListTest, InsertDuplicateThrows) {
     EXPECT_THROW(t.insert(1, "duplicate"), std::logic_error);
 }
 
-// Тест: consist
+// consist
 TEST(UnsortedTableOnListTest, ConsistWorks) {
     UnsortedTableOnList<int, std::string> t;
 
@@ -191,7 +191,7 @@ TEST(UnsortedTableOnListTest, ConsistWorks) {
     EXPECT_FALSE(t.consist(4));
 }
 
-// Тест: replace существующего ключа
+//replace существующего ключа
 TEST(UnsortedTableOnListTest, ReplaceExisting) {
     UnsortedTableOnList<int, std::string> t;
 
@@ -201,7 +201,7 @@ TEST(UnsortedTableOnListTest, ReplaceExisting) {
     EXPECT_EQ(t.find(7), "SEVEN");
 }
 
-// Тест: replace несуществующего ключа → вставка
+// replace несуществующего ключа → вставка
 TEST(UnsortedTableOnListTest, ReplaceNonExistingInserts) {
     UnsortedTableOnList<int, std::string> t;
 
@@ -211,7 +211,7 @@ TEST(UnsortedTableOnListTest, ReplaceNonExistingInserts) {
     EXPECT_EQ(t.find(100), "hundred");
 }
 
-// Тест: find бросает исключение
+// find бросает исключение
 TEST(UnsortedTableOnListTest, FindThrowsIfNotFound) {
     UnsortedTableOnList<int, std::string> t;
 
@@ -220,7 +220,7 @@ TEST(UnsortedTableOnListTest, FindThrowsIfNotFound) {
     EXPECT_THROW(t.find(2), std::logic_error);
 }
 
-// Тест: erase существующего ключа
+// erase существующего ключа
 TEST(UnsortedTableOnListTest, EraseExisting) {
     UnsortedTableOnList<int, std::string> t;
 
@@ -233,7 +233,7 @@ TEST(UnsortedTableOnListTest, EraseExisting) {
     EXPECT_TRUE(t.consist(2));
 }
 
-// Тест: erase несуществующего ключа (не должно падать)
+//erase несуществующего ключа (не должно падать)
 TEST(UnsortedTableOnListTest, EraseNonExistingDoesNothing) {
     UnsortedTableOnList<int, std::string> t;
 
@@ -244,7 +244,7 @@ TEST(UnsortedTableOnListTest, EraseNonExistingDoesNothing) {
     EXPECT_TRUE(t.consist(1));
 }
 
-// Тест: is_empty
+// is_empty
 TEST(UnsortedTableOnListTest, IsEmptyWorks) {
     UnsortedTableOnList<int, std::string> t;
 
@@ -255,7 +255,7 @@ TEST(UnsortedTableOnListTest, IsEmptyWorks) {
     EXPECT_FALSE(t.is_empty());
 }
 
-// Тест: print (просто проверяем, что не падает)
+//print (просто проверяем, что не падает)
 TEST(UnsortedTableOnListTest, PrintDoesNotCrash) {
     UnsortedTableOnList<int, std::string> t;
 

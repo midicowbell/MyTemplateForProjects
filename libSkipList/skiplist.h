@@ -4,6 +4,7 @@
 #include <utility>
 #include <cstdlib>
 #include <vector>
+#include <ctime>
 
 template<typename Tkey, typename Tvalue>
 struct Node
@@ -23,10 +24,27 @@ private:
 	int currLvl;
 	Node<Tkey, Tvalue>* head;
 
+	// Вспомогательный метод для поиска узлов перед целевым (для вставки/удаления)
+	// Возвращает вектор узлов на каждом уровне, после которых идет целевой узел
+	std::vector<Node<Tkey, Tvalue>*> _findPredecessors(const Tkey& key) {
+		Node<Tkey, Tvalue>* curr = head;
+		std::vector<Node<Tkey, Tvalue>*> update(maxLvl, nullptr);
+
+		for (int lvl = currLvl - 1; lvl >= 0; lvl--) {
+			while (curr->forward[lvl] && curr->forward[lvl]->_data.first < key) {
+				curr = curr->forward[lvl];
+			}
+			update[lvl] = curr;
+		}
+		return update;
+	}
+
 public:
 	SkipList(int maxlvl) : currLvl(1), maxLvl(maxlvl) {
+		srand(static_cast<unsigned>(time(nullptr))); 
 		head = new Node<Tkey, Tvalue>(Tkey{}, Tvalue{}, maxLvl);
 	}
+
 	~SkipList() {
 		Node<Tkey, Tvalue>* curr = head->forward[0];
 		while (curr) {
@@ -36,14 +54,16 @@ public:
 		}
 		delete head;
 	}
-	int randomLvl() {
+
+	int randomLvl() const {
 		int lvl = 1;
 		while ((rand() % 3 != 0) && lvl < maxLvl) {
 			lvl++;
 		}
 		return lvl;
 	}
-	Node<Tkey, Tvalue>* find(const Tkey& key) noexcept {
+
+	Node<Tkey, Tvalue>* find(const Tkey& key) const noexcept {
 		Node<Tkey, Tvalue>* curr = head;
 		for (int lvl = currLvl - 1; lvl >= 0; lvl--) {
 			while (curr->forward[lvl] && curr->forward[lvl]->_data.first < key) {
@@ -56,20 +76,16 @@ public:
 		}
 		return nullptr;
 	}
+
 	void insert(const Tkey& key, const Tvalue& value) {
-		Node<Tkey, Tvalue>* curr = head;
-		std::vector<Node<Tkey, Tvalue>*> update(maxLvl, nullptr);
-		for (int lvl = currLvl - 1; lvl >= 0; lvl--) {
-			while (curr->forward[lvl] && curr->forward[lvl]->_data.first < key) {
-				curr = curr->forward[lvl];
-			}
-			update[lvl] = curr;
-		}
-		curr = curr->forward[0];
+		std::vector<Node<Tkey, Tvalue>*> update = _findPredecessors(key);
+
+		Node<Tkey, Tvalue>* curr = update[0]->forward[0];
 		if (curr && curr->_data.first == key) {
 			curr->_data.second = value;
 			return;
 		}
+
 		int newLvl = randomLvl();
 		if (newLvl > currLvl) {
 			for (int lvl = currLvl; lvl < newLvl; lvl++) {
@@ -77,6 +93,7 @@ public:
 			}
 			currLvl = newLvl;
 		}
+
 		Node<Tkey, Tvalue>* newNode = new Node<Tkey, Tvalue>(key, value, newLvl);
 		for (int lvl = 0; lvl < newLvl; lvl++) {
 			newNode->forward[lvl] = update[lvl]->forward[lvl];
