@@ -1,6 +1,9 @@
 #include <gtest/gtest.h>
+#include <queue>
 #include "../libAlgos/algos.h"
-// Тест 1: Проверка размера матрицы
+
+
+//Проверка размера матрицы
 TEST(MazeTest, CorrectSize) {
     int N = 5, M = 5;
     auto maze = generate(2, 2, N, M);
@@ -9,12 +12,11 @@ TEST(MazeTest, CorrectSize) {
     EXPECT_EQ(maze[0].size(), 2 * M + 1);
 }
 
-// Тест 2: Проверка, что все клетки открыты
+//Проверка, что все клетки открыты
 TEST(MazeTest, AllCellsOpen) {
     int N = 3, M = 3;
     auto maze = generate(1, 1, N, M);
 
-    // Проверяем, что все клетки (в позициях 2*i+1, 2*j+1) открыты
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < M; j++) {
             EXPECT_FALSE(maze[2 * i + 1][2 * j + 1])
@@ -23,7 +25,7 @@ TEST(MazeTest, AllCellsOpen) {
     }
 }
 
-// Тест 3: Проверка входа
+//Проверка входа
 TEST(MazeTest, EntranceExists) {
     int N = 5, M = 5;
     int X = 2;
@@ -33,7 +35,7 @@ TEST(MazeTest, EntranceExists) {
         << "Вход должен быть открыт в позиции X=" << X;
 }
 
-// Тест 4: Проверка выхода
+//Проверка выхода
 TEST(MazeTest, ExitExists) {
     int N = 5, M = 5;
     int Y = 3;
@@ -43,7 +45,7 @@ TEST(MazeTest, ExitExists) {
         << "Выход должен быть открыт в позиции Y=" << Y;
 }
 
-// Тест 5: Минимальный размер (1×1)
+//Минимальный размер (1×1)
 TEST(MazeTest, MinimalSize) {
     int N = 1, M = 1;
     auto maze = generate(0, 0, N, M);
@@ -53,7 +55,7 @@ TEST(MazeTest, MinimalSize) {
     EXPECT_FALSE(maze[1][1]) << "Единственная клетка должна быть открыта";
 }
 
-// Тест 6: Прямоугольный лабиринт
+//Прямоугольный лабиринт
 TEST(MazeTest, RectangularMaze) {
     int N = 2, M = 5;
     auto maze = generate(0, 4, N, M);
@@ -62,7 +64,7 @@ TEST(MazeTest, RectangularMaze) {
     EXPECT_EQ(maze[0].size(), 2 * M + 1);
 }
 
-// Тест 7: Большой лабиринт создается без ошибок
+//Большой лабиринт создается без ошибок
 TEST(MazeTest, LargeMaze) {
     int N = 10, M = 10;
     auto maze = generate(5, 5, N, M);
@@ -70,7 +72,6 @@ TEST(MazeTest, LargeMaze) {
     EXPECT_EQ(maze.size(), 2 * N + 1);
     EXPECT_EQ(maze[0].size(), 2 * M + 1);
 
-    // Проверяем, что есть стены
     int wall_count = 0;
     for (int i = 0; i < 2 * N + 1; i++) {
         for (int j = 0; j < 2 * M + 1; j++) {
@@ -80,24 +81,22 @@ TEST(MazeTest, LargeMaze) {
     EXPECT_GT(wall_count, 0) << "Должны остаться внешние стены";
 }
 
-// Тест 8: Проверка внешних стен (кроме входа/выхода)
+//Проверка внешних стен (кроме входа/выхода)
 TEST(MazeTest, OuterWalls) {
     int N = 3, M = 3;
     int X = 1, Y = 1;
     auto maze = generate(X, Y, N, M);
 
-    // Проверяем левую стену
     for (int i = 0; i < 2 * N + 1; i++) {
         EXPECT_TRUE(maze[i][0]) << "Левая стена должна быть закрыта";
     }
 
-    // Проверяем правую стену
     for (int i = 0; i < 2 * N + 1; i++) {
         EXPECT_TRUE(maze[i][2 * M]) << "Правая стена должна быть закрыта";
     }
 }
 
-// Тест 9: Лабиринт не пустой (есть проходы)
+//Лабиринт не пустой (есть проходы)
 TEST(MazeTest, HasPassages) {
     int N = 4, M = 4;
     auto maze = generate(0, 3, N, M);
@@ -113,7 +112,7 @@ TEST(MazeTest, HasPassages) {
         << "Должно быть больше проходов, чем просто клетки";
 }
 
-// Тест 10: Разные размеры работают
+//Разные размеры работают
 TEST(MazeTest, VariousSizes) {
     std::vector<std::pair<int, int>> sizes = {
         {1, 1}, {2, 2}, {3, 5}, {5, 3}, {10, 10}
@@ -126,4 +125,38 @@ TEST(MazeTest, VariousSizes) {
         EXPECT_EQ(maze[0].size(), 2 * M + 1)
             << "Неверный размер для N=" << N << ", M=" << M;
     }
+}
+
+//Проверка обработки невалидных входов/выходов
+TEST(MazeTest, InvalidInputHandling) {
+    int N = 5, M = 5;
+
+    auto maze1 = generate(-1, 2, N, M);
+    EXPECT_EQ(maze1.size(), 2 * N + 1)
+        << "Должен создать лабиринт даже с невалидным входом";
+
+    auto maze2 = generate(2, M + 5, N, M);
+    EXPECT_EQ(maze2.size(), 2 * N + 1)
+        << "Должен создать лабиринт даже с невалидным выходом";
+
+    auto maze3 = generate(-1, -1, N, M);
+    EXPECT_EQ(maze3.size(), 2 * N + 1)
+        << "Должен создать лабиринт даже с обоими невалидными входами";
+}
+
+// Проверка количества проходов должно быть достаточным
+TEST(MazeTest, AdequatePassages) {
+    int N = 5, M = 5;
+    auto maze = generate(2, 2, N, M);
+
+    int passage_count = 0;
+    for (int i = 0; i < 2 * N + 1; i++) {
+        for (int j = 0; j < 2 * M + 1; j++) {
+            if (!maze[i][j]) passage_count++;
+        }
+    }
+
+    int minimum_passages = 2 * N * M - 1;
+    EXPECT_GE(passage_count, minimum_passages)
+        << "Проходов недостаточно для идеального лабиринта";
 }
