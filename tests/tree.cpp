@@ -2,7 +2,6 @@
 #include <sstream>
 #include "Tree.h"
 
-// ============ КОНСТРУКТОР ============
 
 // Проверяем что новое дерево пустое
 TEST(TreeConstructor, DefaultConstructorCreatesEmptyTree) {
@@ -10,7 +9,6 @@ TEST(TreeConstructor, DefaultConstructorCreatesEmptyTree) {
     EXPECT_TRUE(tree.is_empty());
 }
 
-// ============ INSERT - ВСТАВКА ============
 
 // Проверяем что после вставки одного элемента дерево не пустое
 TEST(TreeInsert, InsertSingleElement) {
@@ -38,7 +36,6 @@ TEST(TreeInsert, InsertDuplicateKeyUpdatesValue) {
     EXPECT_FALSE(tree.is_empty());
 }
 
-// ============ LCR (Левое → Корень → Правое) ============
 
 // Проверяем что LCR выводит все элементы дерева
 TEST(TreeLCR, LCROutputsAllElements) {
@@ -49,7 +46,6 @@ TEST(TreeLCR, LCROutputsAllElements) {
     tree.insert(2, "two");
     tree.insert(8, "eight");
 
-    // Перехватываем стандартный вывод
     std::stringstream buffer;
     std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
 
@@ -100,7 +96,6 @@ TEST(TreeLCR, LCREmptyTree) {
     EXPECT_NO_THROW(tree.lcr());
 }
 
-// ============ LRC (Левое → Правое → Корень) ============
 
 // Проверяем что LRC выводит все элементы дерева
 TEST(TreeLRC, LRCOutputsAllElements) {
@@ -152,7 +147,6 @@ TEST(TreeLRC, LRCRootComesLast) {
 
     std::string output = buffer.str();
 
-    // Позиция (3) должна быть раньше позиции (5)
     size_t pos3 = output.find("(3:three)");
     size_t pos5 = output.find("(5:five)");
     EXPECT_TRUE(pos3 != std::string::npos && pos5 != std::string::npos);
@@ -165,7 +159,6 @@ TEST(TreeLRC, LRCEmptyTree) {
     EXPECT_NO_THROW(tree.lrc());
 }
 
-// ============ CLR (Корень → Левое → Правое) ============
 
 // Проверяем что CLR выводит все элементы дерева
 TEST(TreeCLR, CLROutputsAllElements) {
@@ -230,7 +223,6 @@ TEST(TreeCLR, CLREmptyTree) {
     EXPECT_NO_THROW(tree.clr());
 }
 
-// ============ WIDTH (В ШИРИНУ) ============
 
 // Проверяем что WIDTH выводит элементы по уровням
 TEST(TreeWidth, WidthHasLevelStructure) {
@@ -328,8 +320,6 @@ TEST(TreeWidth, WidthEmptyTree) {
     Tree<int, std::string> tree;
     EXPECT_NO_THROW(tree.width());
 }
-
-// ============ КОМПЛЕКСНЫЕ ТЕСТЫ ============
 
 // Проверяем что все четыре метода работают одновременно на одном дереве
 TEST(TreeComplex, AllMethodsTogether) {
