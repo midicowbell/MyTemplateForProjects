@@ -170,16 +170,24 @@ Polynom Polynom::operator-(const Polynom& other) {
 
 Polynom Polynom::operator*(const Polynom& other) {
 	Polynom result;
-	for (auto it1 = this->getMonoms().begin(); it1 != this->getMonoms().end(); ++it1) {
-		for (auto it2 = other.getMonoms().begin(); it2 != other.getMonoms().end(); ++it2) {
-			Monom m(it1->getCoeff() * it2->getCoeff(),
-				it1->getDegX() + it2->getDegX(),
-				it1->getDegY() + it2->getDegY(),
-				it1->getDegZ() + it2->getDegZ());
-			result.addMonom(m);
+	for (auto it1 = other.getMonoms().begin(); it1 != other.getMonoms().end(); ++it1) {
+		result += (*this)  * (*it1);
 		}
+	return result;
+	}
+	
+
+Polynom Polynom::operator*(const Monom& other) {
+	Polynom result;
+	for (auto it1 = this->getMonoms().begin(); it1 != this->getMonoms().end(); ++it1) {
+		Monom m(it1->getCoeff() * other.getCoeff(),
+			it1->getDegX() + other.getDegX(),
+			it1->getDegY() + other.getDegY(),
+			it1->getDegZ() + other.getDegZ());
+		result.addMonom(m);
 	}
 	return result;
+
 }
 
 Polynom Polynom::operator/(const Polynom& other) {

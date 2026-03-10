@@ -52,7 +52,7 @@ bool Monom::operator>(const Monom& other) const {
 	if (deg[2] != other.getDegZ()) {
 		return deg[2] > other.getDegZ();
 	}
-	return coeff > other.getCoeff();
+	return false;
 }
 
 
