@@ -24,7 +24,7 @@ private:
 	int currLvl;
 	Node<Tkey, Tvalue>* head;
 
-	// Вспомогательный метод для поиска узлов перед целевым (для вставки/удаления)
+	// Вспомогательный метод для поиска узлов перед целевым (для вставки)
 	// Возвращает вектор узлов на каждом уровне, после которых идет целевой узел
 	std::vector<Node<Tkey, Tvalue>*> _findPredecessors(const Tkey& key) {
 		Node<Tkey, Tvalue>* curr = head;

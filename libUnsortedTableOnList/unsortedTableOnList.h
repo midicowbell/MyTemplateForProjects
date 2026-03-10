@@ -11,7 +11,6 @@ private:
 	List<std::pair<Tkey, Tvalue>> _list;
 
 	// Вспомогательный метод для поиска элемента
-	// Возвращает iterator на найденный элемент или end() если не найден
 	auto _findIterator(const Tkey& key) const noexcept {
 		for (auto it = _list.begin(); it != _list.end(); ++it) {
 			if ((*it).first == key) {

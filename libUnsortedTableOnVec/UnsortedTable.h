@@ -11,7 +11,6 @@ private:
     Tvector<std::pair<Tkey, Tvalue>> _rows;
 
     // Вспомогательный метод для поиска индекса (используется несколько раз)
-    // Возвращает индекс элемента с заданным ключом или -1 если не найден
     int _findIndex(const Tkey& key) const noexcept {
         for (size_t i = 0; i < _rows.size(); i++) {
             if (_rows[i].first == key) {
