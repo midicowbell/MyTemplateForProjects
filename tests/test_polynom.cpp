@@ -182,7 +182,7 @@ TEST(PolynomOperators, MinusEqual) {
 }
 
 // ----------------------
-//  operator* (poly × poly)
+//  operator* (polynom × polynom)
 // ----------------------
 
 TEST(PolynomOperators, MultiplyPolynomials) {
