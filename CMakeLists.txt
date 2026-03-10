@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include_directories(lib)
 include_directories(libTvector) # Исправил регистр v
 include_directories(libUnsortedTableOnVec)
+include_directories(libAlgos)
 
 add_subdirectory(libAlgos)
 add_subdirectory(lib_dsu)
