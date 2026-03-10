@@ -21,15 +21,12 @@ class Tree {
 private:
 	Node<Tkey, Tvalue>* _root;
 
-	// ============ LCR_REC - Левое → Корень → Правое ============
 	void lcr_rec(Node<Tkey, Tvalue>* node) const {
 		if (node == nullptr) return;
 		lcr_rec(node->left);
 		std::cout << "(" << node->data.first << ":" << node->data.second << ") ";
 		lcr_rec(node->right);
 	}
-
-	// ============ LRC_REC - Левое → Правое → Корень ============
 	void lrc_rec(Node<Tkey, Tvalue>* node) const {
 		if (node == nullptr) return;
 		lrc_rec(node->left);
@@ -37,15 +34,12 @@ private:
 		std::cout << "(" << node->data.first << ":" << node->data.second << ") ";
 	}
 
-	// ============ CLR_REC - Корень → Левое → Правое ============
 	void clr_rec(Node<Tkey, Tvalue>* node) const {
 		if (node == nullptr) return;
 		std::cout << "(" << node->data.first << ":" << node->data.second << ") ";
 		clr_rec(node->left);
 		clr_rec(node->right);
 	}
-
-	// ============ WIDTH_REC - В ШИРИНУ (LEVEL ORDER) ============
 	void width_rec() const {
 		if (is_empty()) {
 			std::cout << "Width: Tree is empty" << std::endl;
@@ -94,8 +88,6 @@ public:
 	~Tree() {
 		deleteTree(_root);
 	}
-
-	// ============ PUBLIC INSERT ============
 	void insert(const Tkey& key, const Tvalue& value) {
 		if (_root == nullptr) {
 			_root = new Node<Tkey, Tvalue>(key, value);
@@ -137,8 +129,6 @@ public:
 	bool is_empty() const {
 		return _root == nullptr;
 	}
-
-	// ============ PUBLIC PRINT METHODS ============
 	void lcr() const {
 		std::cout << "LCR (Левое → Корень → Правое): ";
 		lcr_rec(_root);
