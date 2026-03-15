@@ -153,7 +153,7 @@ void Polynom::addMonom(const Monom& m) {
 Polynom Polynom::operator+(const Polynom& other) {
 	Polynom result(*this);
 	for (auto it = other.getMonoms().begin(); it != other.getMonoms().end(); ++it) {
-		result.addMonom(*it);
+		result += *it
 	}
 	return result;
 }
@@ -189,6 +189,35 @@ Polynom Polynom::operator*(const Monom& other) {
 	return result;
 
 }
+
+Polynom Polynom::operator+(const Monom& other) {
+	Polynom result(*this);
+	result.addMonom(other);
+	return result;
+}
+Polynom Polynom::operator-(const Monom& other)  {
+	Polynom result(*this);
+	Monom neg = other;
+	neg.setCoeff(-neg.getCoeff()); 
+	result.addMonom(neg);          
+	return result;
+}
+Polynom Polynom::operator/(const Monom& other) {
+	if (other.getCoeff() == 0) {
+		throw std::logic_error("Division by zero monom");
+	}
+	Polynom result;
+	for (auto it1 = this->getMonoms().begin(); it1 != this->getMonoms().end(); ++it1) {
+		if (*it1.)
+		Monom m(it1->getCoeff() / other.getCoeff(),
+			it1->getDegX() - other.getDegX(),
+			it1->getDegY() - other.getDegY(),
+			it1->getDegZ() - other.getDegZ());
+		result.addMonom(m);
+	}
+	return result;
+}
+
 
 Polynom Polynom::operator/(const Polynom& other) {
 	throw std::logic_error("Polynomial division is not implemented");
