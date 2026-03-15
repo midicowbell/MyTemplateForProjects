@@ -153,17 +153,14 @@ void Polynom::addMonom(const Monom& m) {
 Polynom Polynom::operator+(const Polynom& other) {
 	Polynom result(*this);
 	for (auto it = other.getMonoms().begin(); it != other.getMonoms().end(); ++it) {
-		result += *it
+		result = result + (*it);
 	}
 	return result;
 }
-
 Polynom Polynom::operator-(const Polynom& other) {
 	Polynom result(*this);
 	for (auto it = other.getMonoms().begin(); it != other.getMonoms().end(); ++it) {
-		Monom neg = *it;
-		neg.setCoeff(-neg.getCoeff());
-		result.addMonom(neg);
+		result = result - (*it);
 	}
 	return result;
 }
@@ -203,12 +200,16 @@ Polynom Polynom::operator-(const Monom& other)  {
 	return result;
 }
 Polynom Polynom::operator/(const Monom& other) {
-	if (other.getCoeff() == 0) {
-		throw std::logic_error("Division by zero monom");
+	if (other.getCoeff() == 0.0) {
+		throw std::invalid_argument("Division by zero");
+	}
+	for (auto it = monoms.begin(); it != monoms.end(); ++it) {
+		if (!it->isValidDivision(other)) {
+			throw std::logic_error("Division results in negative degrees");
+		}
 	}
 	Polynom result;
 	for (auto it1 = this->getMonoms().begin(); it1 != this->getMonoms().end(); ++it1) {
-		if (*it1.)
 		Monom m(it1->getCoeff() / other.getCoeff(),
 			it1->getDegX() - other.getDegX(),
 			it1->getDegY() - other.getDegY(),
@@ -218,23 +219,31 @@ Polynom Polynom::operator/(const Monom& other) {
 	return result;
 }
 
-
 Polynom Polynom::operator/(const Polynom& other) {
 	throw std::logic_error("Polynomial division is not implemented");
+}
+Polynom& Polynom::operator+=(const Monom& other) {
+	this->addMonom(other);
+	return *this;
+}
+
+Polynom& Polynom::operator-=(const Monom& other) {
+	Monom neg = other;
+	neg.setCoeff(-neg.getCoeff());
+	this->addMonom(neg);
+	return *this;
 }
 
 Polynom& Polynom::operator+=(const Polynom& other) {
 	for (auto it = other.getMonoms().begin(); it != other.getMonoms().end(); ++it) {
-		addMonom(*it);
+		*this += *it; 
 	}
 	return *this;
 }
 
 Polynom& Polynom::operator-=(const Polynom& other) {
 	for (auto it = other.getMonoms().begin(); it != other.getMonoms().end(); ++it) {
-		Monom neg = *it;
-		neg.setCoeff(-neg.getCoeff());
-		addMonom(neg);
+		*this -= *it;
 	}
 	return *this;
 }

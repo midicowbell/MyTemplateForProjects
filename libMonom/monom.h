@@ -7,12 +7,10 @@ class Monom {
 private:
 	int deg[3];
 	double coeff;
-
+public:
 	bool hasSameDegrees(const Monom& other) const;
 	bool hasNegativeDegrees() const;
 	bool isValidDivision(const Monom& other) const;
-
-public:
 	Monom(const Monom& other);
 	Monom(double coeff, int degX, int degY, int degZ);
 	Monom() : coeff(0.0) { deg[0] = deg[1] = deg[2] = 0; }
