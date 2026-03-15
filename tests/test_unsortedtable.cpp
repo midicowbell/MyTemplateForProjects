@@ -383,3 +383,63 @@ TEST(SkipListTest, PrintDoesNotCrash) {
 
     EXPECT_NO_THROW(list.print());
 }
+
+//  Базовое удаление существующего элемента
+TEST(SkipListTest, RemoveExistingElement) {
+    std::srand(42);
+    SkipList<int, int> list(10);
+    list.insert(10, 100);
+    list.insert(20, 200);
+    list.insert(30, 300);
+
+    list.remove(20);
+
+    EXPECT_EQ(list.find(20), nullptr);
+    EXPECT_NE(list.find(10), nullptr);
+    EXPECT_NE(list.find(30), nullptr);
+}
+
+//Попытка удаления несуществующего элемента
+TEST(SkipListTest, RemoveNonExistentElement) {
+    std::srand(42);
+    SkipList<int, int> list(10);
+    list.insert(10, 100);
+    list.insert(30, 300);
+    list.remove(99);
+    EXPECT_NE(list.find(10), nullptr);
+    EXPECT_NE(list.find(30), nullptr);
+    EXPECT_EQ(list.find(10)->_data.second, 100);
+}
+
+//Удаление граничных элементов (первого и последнего)
+TEST(SkipListTest, RemoveBoundaryElements) {
+    std::srand(42);
+    SkipList<int, int> list(10);
+    list.insert(5, 50);  
+    list.insert(10, 100);
+    list.insert(15, 150); 
+
+    list.remove(5);
+    EXPECT_EQ(list.find(5), nullptr);
+    EXPECT_NE(list.find(10), nullptr);
+
+    list.remove(15);
+    EXPECT_EQ(list.find(15), nullptr);
+    EXPECT_NE(list.find(10), nullptr);
+}
+
+//Смешанные операции (вставка-удаление-вставка)
+TEST(SkipListTest, MixedInsertAndRemove) {
+    std::srand(42);
+    SkipList<int, int> list(10);
+    list.insert(10, 100);
+    list.insert(20, 200);
+
+    list.remove(10);
+    EXPECT_EQ(list.find(10), nullptr);
+
+    list.insert(10, 101); 
+    EXPECT_NE(list.find(10), nullptr);
+    EXPECT_EQ(list.find(10)->_data.second, 101); 
+    EXPECT_NE(list.find(20), nullptr); 
+}

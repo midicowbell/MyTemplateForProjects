@@ -100,17 +100,65 @@ public:
 			update[lvl]->forward[lvl] = newNode;
 		}
 	}
+	void remove(const Tkey& key) {
+		std::vector<Node<Tkey, Tvalue>*> update = _findPredecessors(key);
+		Node<Tkey, Tvalue>* nodeToDelete = update[0]->forward[0];
+		if (nodeToDelete != nullptr && nodeToDelete->_data.first == key) {
+			for (int lvl = 0; lvl < currLvl; ++lvl) {
+				if (update[lvl]->forward[lvl] != nodeToDelete) {
+					break;
+				}
+				update[lvl]->forward[lvl] = nodeToDelete->forward[lvl];
+			}
+
+			delete nodeToDelete;
+
+			while (currLvl > 1 && head->forward[currLvl - 1] == nullptr) {
+				currLvl--;
+			}
+		}
+	}
+
+	//void print() const {
+	//	for (int lvl = currLvl - 1; lvl >= 0; lvl--) {
+	//		std::cout << "level " << lvl << ": ";
+	//		Node<Tkey, Tvalue>* curr = head->forward[lvl];
+	//		while (curr) {
+	//			std::cout << "(" << curr->_data.first << ":" << curr->_data.second << ") ";
+	//			curr = curr->forward[lvl];
+	//		}
+	//		std::cout << "\n";
+	//	}
+	//	std::cout << "\n";
+	//}
 	void print() const {
+		if (!head->forward[0]) {
+			std::cout << "Skip list is empty\n";
+			return;
+		}
+
+		std::cout << "\nSKIP LIST:\n";
+
 		for (int lvl = currLvl - 1; lvl >= 0; lvl--) {
-			std::cout << "level " << lvl << ": ";
+			std::cout << "L" << lvl << ": ";
+
 			Node<Tkey, Tvalue>* curr = head->forward[lvl];
-			while (curr) {
-				std::cout << "(" << curr->_data.first << ":" << curr->_data.second << ") ";
-				curr = curr->forward[lvl];
+			Node<Tkey, Tvalue>* bottom = head->forward[0];
+
+			while (bottom) {
+				if (curr && curr->_data.first == bottom->_data.first) {
+					std::cout << "[" << curr->_data.first << ":" << curr->_data.second << "]";
+					curr = curr->forward[lvl];
+				}
+				else {
+					std::cout << "[   ]";
+				}
+
+				bottom = bottom->forward[0];
+				if (bottom) std::cout << " ";
 			}
 			std::cout << "\n";
 		}
 		std::cout << "\n";
 	}
-	// доделать
 };
