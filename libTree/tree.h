@@ -1,168 +1,144 @@
 #pragma once
 #include <iostream>
 #include <queue>
+#include <stdexcept>
+#include <utility>
 
 template<typename Tkey, typename Tvalue>
 struct Node {
     std::pair<Tkey, Tvalue> data;
-    Node* left;
-    Node* right;
-public:
+    Node<Tkey, Tvalue>* left;
+    Node<Tkey, Tvalue>* right;
+
     Node(const Tkey& key, const Tvalue& value)
         : data(key, value), left(nullptr), right(nullptr) {
     }
-    Node() : data(), left(nullptr), right(nullptr) {}
 };
 
 template<typename Tkey, typename Tvalue>
 class Tree {
 private:
     Node<Tkey, Tvalue>* _root;
+
     void lcr_rec(Node<Tkey, Tvalue>* node) const {
-        if (node == nullptr) return;
+        if (!node) return;
         lcr_rec(node->left);
         std::cout << "(" << node->data.first << ":" << node->data.second << ") ";
         lcr_rec(node->right);
     }
+
     void lrc_rec(Node<Tkey, Tvalue>* node) const {
-        if (node == nullptr) return;
+        if (!node) return;
         lrc_rec(node->left);
         lrc_rec(node->right);
         std::cout << "(" << node->data.first << ":" << node->data.second << ") ";
     }
+
     void clr_rec(Node<Tkey, Tvalue>* node) const {
-        if (node == nullptr) return;
+        if (!node) return;
         std::cout << "(" << node->data.first << ":" << node->data.second << ") ";
         clr_rec(node->left);
         clr_rec(node->right);
     }
-    void width_rec() const {
-        if (is_empty()) {
-            std::cout << "Width: Tree is empty" << std::endl;
-            return;
-        }
-        std::queue<Node<Tkey, Tvalue>*> q;
-        q.push(_root);
-        int level = 0;
-        while (!q.empty()) {
-            int levelSize = q.size();
-            std::cout << "Level " << level << ": ";
-            for (int i = 0; i < levelSize; i++) {
-                Node<Tkey, Tvalue>* node = q.front();
-                q.pop();
-                std::cout << "(" << node->data.first << ":" << node->data.second << ") ";
-                if (node->left)  q.push(node->left);
-                if (node->right) q.push(node->right);
-            }
-            std::cout << std::endl;
-            level++;
-        }
-    }
-    Node<Tkey, Tvalue>* find_rec(Node<Tkey, Tvalue>* node, const Tkey& key) const {
-        if (node == nullptr) return nullptr;
-        if (key == node->data.first) return node;
-        if (key < node->data.first)  return find_rec(node->left, key);
-        else                         return find_rec(node->right, key);
-    }
-    Node<Tkey, Tvalue>* find_min(Node<Tkey, Tvalue>* node) const {
-        while (node->left != nullptr)
-            node = node->left;
-        return node;
-    }
-    Node<Tkey, Tvalue>* remove_rec(Node<Tkey, Tvalue>* node, const Tkey& key) {
-        if (node == nullptr) return nullptr;
-
-        if (key < node->data.first) {
-            node->left = remove_rec(node->left, key);
-        }
-        else if (key > node->data.first) {
-            node->right = remove_rec(node->right, key);
-        }
-        else {
-            if (node->left == nullptr) {
-                Node<Tkey, Tvalue>* tmp = node->right;
-                delete node;
-                return tmp;
-            }
-            else if (node->right == nullptr) {
-                Node<Tkey, Tvalue>* tmp = node->left;
-                delete node;
-                return tmp;
-            }
-            else {
-                Node<Tkey, Tvalue>* successor = find_min(node->right);
-                node->data = successor->data;
-                node->right = remove_rec(node->right, successor->data.first);
-            }
-        }
-        return node;
-    }
 
     void deleteTree(Node<Tkey, Tvalue>* node) {
-        if (node == nullptr) return;
+        if (!node) return;
         deleteTree(node->left);
         deleteTree(node->right);
         delete node;
+    }
+    Node<Tkey, Tvalue>* find_parent(const Tkey& key) const {
+        if (!_root || _root->data.first == key) return _root;
+
+        Node<Tkey, Tvalue>* curr = _root;
+        Node<Tkey, Tvalue>* parent = nullptr;
+
+        while (curr != nullptr) {
+            if (curr->data.first == key) return parent;
+
+            parent = curr;
+            if (key < curr->data.first)
+                curr = curr->left;
+            else
+                curr = curr->right;
+        }
+        return parent;
     }
 
 public:
     Tree() : _root(nullptr) {}
     ~Tree() { deleteTree(_root); }
 
+    bool is_empty() const { return _root == nullptr; }
+
+    Tvalue* find(const Tkey& key) {
+        Node<Tkey, Tvalue>* curr = _root;
+        while (curr) {
+            if (curr->data.first == key) return &(curr->data.second);
+            if (key < curr->data.first) curr = curr->left;
+            else curr = curr->right;
+        }
+        return nullptr;
+    }
+
     void insert(const Tkey& key, const Tvalue& value) {
-        if (_root == nullptr) {
+        if (!_root) {
             _root = new Node<Tkey, Tvalue>(key, value);
             return;
         }
-        std::queue<Node<Tkey, Tvalue>*> q;
-        q.push(_root);
-        while (!q.empty()) {
-            Node<Tkey, Tvalue>* node = q.front();
-            q.pop();
-            if (key < node->data.first) {
-                if (!node->left) { node->left = new Node<Tkey, Tvalue>(key, value); return; }
-                else              q.push(node->left);
-            }
-            else if (key > node->data.first) {
-                if (!node->right) { node->right = new Node<Tkey, Tvalue>(key, value); return; }
-                else               q.push(node->right);
-            }
-            else {
-                node->data.second = value;
-                return;
-            }
+        Node<Tkey, Tvalue>* parent = find_parent(key);
+        if (parent->data.first == key ||
+            (parent->left && parent->left->data.first == key) ||
+            (parent->right && parent->right->data.first == key)) {
+            throw std::logic_error("The key is already in use");
+        }
+
+        if (key < parent->data.first) {
+            parent->left = new Node<Tkey, Tvalue>(key, value);
+        }
+        else {
+            parent->right = new Node<Tkey, Tvalue>(key, value);
         }
     }
 
-    const Tvalue* find(const Tkey& key) const {
-        Node<Tkey, Tvalue>* result = find_rec(_root, key);
-        if (result == nullptr) return nullptr;
-        return &result->data.second;
-    }
-
-    void remove(const Tkey& key) {
-        _root = remove_rec(_root, key);
-    }
-
-    bool is_empty() const { return _root == nullptr; }
-
+    // Обходы
     void lcr() const {
-        std::cout << "LCR (Левое → Корень → Правое): ";
+        std::cout << "LCR: ";
         lcr_rec(_root);
         std::cout << std::endl;
     }
+
     void lrc() const {
-        std::cout << "LRC (Левое → Правое → Корень): ";
+        std::cout << "LRC: ";
         lrc_rec(_root);
         std::cout << std::endl;
     }
+
     void clr() const {
-        std::cout << "CLR (Корень → Левое → Правое): ";
+        std::cout << "CLR: ";
         clr_rec(_root);
         std::cout << std::endl;
     }
+
     void width() const {
-        std::cout << "WIDTH (В ШИРИНУ):" << std::endl;
-        width_rec();
+        std::cout << "WIDTH:" << std::endl;
+        if (is_empty()) return;
+
+        std::queue<Node<Tkey, Tvalue>*> q;
+        q.push(_root);
+        int level = 0;
+        while (!q.empty()) {
+            int size = q.size();
+            std::cout << "Level " << level << ": ";
+            for (int i = 0; i < size; ++i) {
+                Node<Tkey, Tvalue>* node = q.front();
+                q.pop();
+                std::cout << "(" << node->data.first << ":" << node->data.second << ") ";
+                if (node->left) q.push(node->left);
+                if (node->right) q.push(node->right);
+            }
+            std::cout << std::endl;
+            level++;
+        }
     }
 };

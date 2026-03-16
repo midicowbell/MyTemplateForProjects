@@ -28,13 +28,6 @@ TEST(TreeInsert, InsertMultipleElements) {
     EXPECT_FALSE(tree.is_empty());
 }
 
-// Проверяем что если вставить элемент с существующим ключом, значение обновится
-TEST(TreeInsert, InsertDuplicateKeyUpdatesValue) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(5, "FIVE");  // Переписываем
-    EXPECT_FALSE(tree.is_empty());
-}
 
 
 // Проверяем что LCR выводит все элементы дерева
@@ -447,16 +440,6 @@ TEST(TreeFind, FindInEmptyTreeReturnsNullptr) {
     EXPECT_EQ(tree.find(1), nullptr);
 }
 
-// После обновления значения find возвращает новое значение
-TEST(TreeFind, FindAfterUpdateReturnsNewValue) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(5, "FIVE");
-
-    const std::string* val = tree.find(5);
-    ASSERT_NE(val, nullptr);
-    EXPECT_EQ(*val, "FIVE");
-}
 
 // Поиск крайнего правого элемента
 TEST(TreeFind, FindRightmostElement) {
@@ -481,135 +464,4 @@ TEST(TreeFind, FindLeftmostElement) {
     const std::string* val = tree.find(2);
     ASSERT_NE(val, nullptr);
     EXPECT_EQ(*val, "two");
-}
-
-// ==================== REMOVE ====================
-
-// Удаление единственного элемента делает дерево пустым
-TEST(TreeRemove, RemoveOnlyElementMakesTreeEmpty) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.remove(5);
-    EXPECT_TRUE(tree.is_empty());
-}
-
-// Удаление листа (нет потомков)
-TEST(TreeRemove, RemoveLeafNode) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(7, "seven");
-
-    tree.remove(3);
-
-    EXPECT_EQ(tree.find(3), nullptr);
-    EXPECT_NE(tree.find(5), nullptr);
-    EXPECT_NE(tree.find(7), nullptr);
-}
-
-// Удаление узла с одним левым потомком
-TEST(TreeRemove, RemoveNodeWithOnlyLeftChild) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(2, "two");
-
-    tree.remove(3);  // У 3 есть только левый потомок (2)
-
-    EXPECT_EQ(tree.find(3), nullptr);
-    EXPECT_NE(tree.find(2), nullptr);
-    EXPECT_NE(tree.find(5), nullptr);
-}
-
-// Удаление узла с одним правым потомком
-TEST(TreeRemove, RemoveNodeWithOnlyRightChild) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(4, "four");
-
-    tree.remove(3);  // У 3 есть только правый потомок (4)
-
-    EXPECT_EQ(tree.find(3), nullptr);
-    EXPECT_NE(tree.find(4), nullptr);
-    EXPECT_NE(tree.find(5), nullptr);
-}
-
-// Удаление узла с двумя потомками
-TEST(TreeRemove, RemoveNodeWithTwoChildren) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(7, "seven");
-    tree.insert(2, "two");
-    tree.insert(4, "four");
-
-    tree.remove(3);  // У 3 есть два потомка (2 и 4)
-
-    EXPECT_EQ(tree.find(3), nullptr);
-    EXPECT_NE(tree.find(2), nullptr);
-    EXPECT_NE(tree.find(4), nullptr);
-    EXPECT_NE(tree.find(5), nullptr);
-    EXPECT_NE(tree.find(7), nullptr);
-}
-
-// Удаление корня с двумя потомками
-TEST(TreeRemove, RemoveRootWithTwoChildren) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(7, "seven");
-
-    tree.remove(5);
-
-    EXPECT_EQ(tree.find(5), nullptr);
-    EXPECT_FALSE(tree.is_empty());
-    EXPECT_NE(tree.find(3), nullptr);
-    EXPECT_NE(tree.find(7), nullptr);
-}
-
-// Удаление несуществующего ключа не ломает дерево
-TEST(TreeRemove, RemoveNonExistentKeyDoesNothing) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-
-    EXPECT_NO_THROW(tree.remove(99));
-
-    EXPECT_NE(tree.find(5), nullptr);
-    EXPECT_NE(tree.find(3), nullptr);
-}
-
-// Удаление из пустого дерева не падает
-TEST(TreeRemove, RemoveFromEmptyTreeDoesNotCrash) {
-    Tree<int, std::string> tree;
-    EXPECT_NO_THROW(tree.remove(42));
-}
-
-// После удаления обходы работают корректно
-TEST(TreeRemove, TraversalsWorkAfterRemove) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(7, "seven");
-    tree.remove(3);
-
-    EXPECT_NO_THROW(tree.lcr());
-    EXPECT_NO_THROW(tree.lrc());
-    EXPECT_NO_THROW(tree.clr());
-    EXPECT_NO_THROW(tree.width());
-}
-
-// Удаление всех элементов по одному делает дерево пустым
-TEST(TreeRemove, RemoveAllElementsOneByOne) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(7, "seven");
-
-    tree.remove(3);
-    tree.remove(7);
-    tree.remove(5);
-
-    EXPECT_TRUE(tree.is_empty());
 }

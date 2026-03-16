@@ -3,15 +3,16 @@ cmake_minimum_required(VERSION 3.14)
 project(MyProject)
 include_directories(lib)
 include_directories(libTree)
+include_directories(algorithms)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # подключаем функции (если нужны)
 include(cmake/functions.cmake OPTIONAL)
-include_directories(libTree)
 
 # библиотеки
 add_subdirectory(libTree)
+add_subdirectory(algorithms)
 
 # основной исполняемый файл
 add_subdirectory(src)
