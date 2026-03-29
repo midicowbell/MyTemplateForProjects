@@ -101,7 +101,6 @@ public:
         }
     }
 
-    // Обходы
     void lcr() const {
         std::cout << "LCR: ";
         lcr_rec(_root);

@@ -13,6 +13,7 @@ include(cmake/functions.cmake OPTIONAL)
 # библиотеки
 add_subdirectory(libTree)
 add_subdirectory(algorithms)
+add_subdirectory(libHeap)
 
 # основной исполняемый файл
 add_subdirectory(src)
