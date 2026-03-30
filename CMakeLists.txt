@@ -3,7 +3,9 @@ cmake_minimum_required(VERSION 3.14)
 project(MyProject)
 include_directories(lib)
 include_directories(libTree)
+include_directories(libHeap)
 include_directories(algorithms)
+include_directories(libQueueOnHeap)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -14,7 +16,7 @@ include(cmake/functions.cmake OPTIONAL)
 add_subdirectory(libTree)
 add_subdirectory(algorithms)
 add_subdirectory(libHeap)
-
+add_subdirectory(libQueueOnHeap)
 # основной исполняемый файл
 add_subdirectory(src)
 
