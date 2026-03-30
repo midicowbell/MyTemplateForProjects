@@ -21,8 +21,5 @@ public:
 	bool empty() const {
 		return heap.empty();
 	}
-	size_t size() const {
-		return heap.size();
-	}
 	 
 };

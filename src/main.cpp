@@ -4,17 +4,17 @@
 #include "../algorithms/algorithms.h"
 #include "../libHeap/heap.h"
 #include "../libQueueOnHeap/queue.h"
-template<typename Pr, typename Val>
-void printK(const std::vector<std::pair<Pr, Val>> data, int k) {
-	QueueOnHeap<Pr, Val> pq;
-	for (const auto& item : data) {
-		pq.push(item.first, item.second);
-	}
-	for (int i = 0; i < k && !pq.empty(); i++) {
-		auto item = pq.pop();
-		std::cout << "\n" <<"Приоритет: " <<item.first << " " << item.second;
-	}
-}
+//template<typename Pr, typename Val>
+//void printK(const std::vector<std::pair<Pr, Val>> data, int k) {
+//	QueueOnHeap<Pr, Val> pq;
+//	for (const auto& item : data) {
+//		pq.push(item.first, item.second);
+//	}
+//	for (int i = 0; i < k && !pq.empty(); i++) {
+//		auto item = pq.pop();
+//		std::cout << "\n" <<"Приоритет: " <<item.first << " " << ite;
+//	}
+//}
 
 
 void main() {
@@ -34,31 +34,32 @@ void main() {
 		std::cout << " " << v[i];
 	}
 
+	//QueueOnHeap<int, std::string> _queue;
+	//std::vector < std::pair<int, std::string>> date;
+	//for (int i = 0; i < 20; i++) {
+	//	std::string val = "data_" + std::to_string(i);
+	//	int priority = rand() % 100;
+	//	date.push_back({ priority, val });
+	//}
+	//printK(date, 15);
 	QueueOnHeap<int, std::string> _queue;
-	std::vector < std::pair<int, std::string>> date;
-	for (int i = 0; i < 20; i++) {
-		std::string val = "data_" + std::to_string(i);
-		int priority = rand() % 100;
-		date.push_back({ priority, val });
+	while (true) {
+		std::cout << "\nприоритет:\n";
+		int a;
+		std::cin >> a;
+		if (a < 0) {
+			break;
+		}
+		std::cout << "\nстрока:\n";
+		std::string str;
+		std::cin >> str;
+		_queue.push(a, str);
+
 	}
-	printK(date, 15);
-
-	//while (true) {
-	//	std::cout << "\nприоритет:\n";
-	//	int a;
-	//	std::cin >> a;
-	//	if (a < 0) {
-	//		break;
-	//	}
-	//	std::cout << "\nстрока:\n";
-	//	std::string str;
-	//	std::cin >> str;
-	//	_queue.push(a, str);
-
-	//}
-	//while (!_queue.empty()) {
-	//	std::cout << "\n" << _queue.pop();
-	//}
+	while (!_queue.empty()) {
+		auto item = _queue.pop();
+		std::cout << "\n" << item.first << " " << item.second;
+	}
 	
 		
 	
