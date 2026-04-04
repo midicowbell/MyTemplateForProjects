@@ -9,9 +9,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # подключаем функции (если нужны)
 include(cmake/functions.cmake OPTIONAL)
 include_directories(libTree)
+include_directories(libBSTree)
 
 # библиотеки
 add_subdirectory(libTree)
+add_subdirectory(libBSTree)
 
 # основной исполняемый файл
 add_subdirectory(src)

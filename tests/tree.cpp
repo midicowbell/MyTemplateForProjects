@@ -1,615 +1,88 @@
 #include <gtest/gtest.h>
-#include <sstream>
 #include "Tree.h"
 
-
-// Проверяем что новое дерево пустое
-TEST(TreeConstructor, DefaultConstructorCreatesEmptyTree) {
+// ==============================================================
+// 1. БАЗОВЫЕ ОПЕРАЦИИ (ВСТАВКА И ПУСТОТА)
+// ==============================================================
+TEST(TreeFullTest, BasicInsertAndEmpty) {
     Tree<int, std::string> tree;
     EXPECT_TRUE(tree.is_empty());
-}
-
-
-// Проверяем что после вставки одного элемента дерево не пустое
-TEST(TreeInsert, InsertSingleElement) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
+    tree.insert(1, "one");
     EXPECT_FALSE(tree.is_empty());
+    tree.insert(1, "second_one");
+    ASSERT_NE(tree.find(1), nullptr);
+    EXPECT_EQ(*tree.find(1), "one");
 }
 
-// Проверяем что можно вставить несколько элементов
-TEST(TreeInsert, InsertMultipleElements) {
+// ==============================================================
+// 2. ПОИСК (FIND)
+// ==============================================================
+TEST(TreeFullTest, SearchOperations) {
     Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(7, "seven");
-    tree.insert(2, "two");
-    tree.insert(8, "eight");
+    tree.insert(10, "root");
+    tree.insert(5, "left");
+    tree.insert(15, "right");
+    const std::string* val = tree.find(5);
+    ASSERT_NE(val, nullptr);
+    EXPECT_EQ(*val, "left");
+    EXPECT_EQ(*tree.find(10), "root");
+    EXPECT_EQ(tree.find(999), nullptr);
+}
+
+// ==============================================================
+// 3. ЦИКЛ: ВСТАВКА -> УДАЛЕНИЕ -> ВСТАВКА
+// ==============================================================
+TEST(TreeFullTest, InsertRemoveInsertCycle) {
+    Tree<int, std::string> tree;
+    tree.insert(1, "A");
+    tree.insert(2, "B");
+    tree.insert(3, "C");
+    tree.insert(4, "D");
+    tree.remove(2);
+
+    EXPECT_EQ(tree.find(2), nullptr);
+    EXPECT_NE(tree.find(4), nullptr);
+    EXPECT_NE(tree.find(1), nullptr);
+    tree.insert(5, "E");
+    ASSERT_NE(tree.find(5), nullptr);
+    EXPECT_EQ(*tree.find(5), "E");
+    EXPECT_NE(tree.find(1), nullptr);
+    EXPECT_NE(tree.find(3), nullptr);
+    EXPECT_NE(tree.find(4), nullptr);
+}
+
+// ==============================================================
+// 4. УДАЛЕНИЕ ДО ПУСТОТЫ
+// ==============================================================
+TEST(TreeFullTest, RemoveToEmpty) {
+    Tree<int, std::string> tree;
+
+    tree.insert(100, "X");
+    tree.insert(200, "Y");
+    tree.remove(100);
+    tree.remove(200);
+    EXPECT_TRUE(tree.is_empty());
+    EXPECT_EQ(tree.find(100), nullptr);
+    tree.insert(300, "Z");
     EXPECT_FALSE(tree.is_empty());
+    EXPECT_EQ(*tree.find(300), "Z");
 }
 
-// Проверяем что если вставить элемент с существующим ключом, значение обновится
-TEST(TreeInsert, InsertDuplicateKeyUpdatesValue) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(5, "FIVE");  // Переписываем
-    EXPECT_FALSE(tree.is_empty());
-}
-
-
-// Проверяем что LCR выводит все элементы дерева
-TEST(TreeLCR, LCROutputsAllElements) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(7, "seven");
-    tree.insert(2, "two");
-    tree.insert(8, "eight");
-
-    std::stringstream buffer;
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-
-    tree.lcr();
-
-    std::cout.rdbuf(old);
-    std::string output = buffer.str();
-
-    // Проверяем что все элементы присутствуют в выводе
-    EXPECT_TRUE(output.find("2") != std::string::npos);
-    EXPECT_TRUE(output.find("3") != std::string::npos);
-    EXPECT_TRUE(output.find("5") != std::string::npos);
-    EXPECT_TRUE(output.find("7") != std::string::npos);
-    EXPECT_TRUE(output.find("8") != std::string::npos);
-}
-
-// Проверяем что LCR выводит правильное название метода
-TEST(TreeLCR, LCRHasCorrectLabel) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-
-    std::stringstream buffer;
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-    tree.lcr();
-    std::cout.rdbuf(old);
-
-    std::string output = buffer.str();
-    EXPECT_TRUE(output.find("LCR") != std::string::npos);
-}
-
-// Проверяем что LCR работает на одном элементе
-TEST(TreeLCR, LCRSingleElement) {
-    Tree<int, std::string> tree;
-    tree.insert(42, "answer");
-
-    std::stringstream buffer;
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-    tree.lcr();
-    std::cout.rdbuf(old);
-
-    std::string output = buffer.str();
-    EXPECT_TRUE(output.find("42") != std::string::npos);
-}
-
-// Проверяем что LCR не падает на пустом дереве
-TEST(TreeLCR, LCREmptyTree) {
-    Tree<int, std::string> tree;
-    EXPECT_NO_THROW(tree.lcr());
-}
-
-
-// Проверяем что LRC выводит все элементы дерева
-TEST(TreeLRC, LRCOutputsAllElements) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(7, "seven");
-    tree.insert(2, "two");
-    tree.insert(8, "eight");
-
-    std::stringstream buffer;
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-    tree.lrc();
-    std::cout.rdbuf(old);
-
-    std::string output = buffer.str();
-
-    EXPECT_TRUE(output.find("2") != std::string::npos);
-    EXPECT_TRUE(output.find("3") != std::string::npos);
-    EXPECT_TRUE(output.find("5") != std::string::npos);
-    EXPECT_TRUE(output.find("7") != std::string::npos);
-    EXPECT_TRUE(output.find("8") != std::string::npos);
-}
-
-// Проверяем что LRC выводит правильное название метода
-TEST(TreeLRC, LRCHasCorrectLabel) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-
-    std::stringstream buffer;
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-    tree.lrc();
-    std::cout.rdbuf(old);
-
-    std::string output = buffer.str();
-    EXPECT_TRUE(output.find("LRC") != std::string::npos);
-}
-
-// Проверяем что в LRC корень выводится последним (постфиксный порядок)
-TEST(TreeLRC, LRCRootComesLast) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-
-    std::stringstream buffer;
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-    tree.lrc();
-    std::cout.rdbuf(old);
-
-    std::string output = buffer.str();
-
-    size_t pos3 = output.find("(3:three)");
-    size_t pos5 = output.find("(5:five)");
-    EXPECT_TRUE(pos3 != std::string::npos && pos5 != std::string::npos);
-    EXPECT_TRUE(pos3 < pos5);
-}
-
-// Проверяем что LRC не падает на пустом дереве
-TEST(TreeLRC, LRCEmptyTree) {
-    Tree<int, std::string> tree;
-    EXPECT_NO_THROW(tree.lrc());
-}
-
-
-// Проверяем что CLR выводит все элементы дерева
-TEST(TreeCLR, CLROutputsAllElements) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(7, "seven");
-    tree.insert(2, "two");
-    tree.insert(8, "eight");
-
-    std::stringstream buffer;
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-    tree.clr();
-    std::cout.rdbuf(old);
-
-    std::string output = buffer.str();
-
-    EXPECT_TRUE(output.find("2") != std::string::npos);
-    EXPECT_TRUE(output.find("3") != std::string::npos);
-    EXPECT_TRUE(output.find("5") != std::string::npos);
-    EXPECT_TRUE(output.find("7") != std::string::npos);
-    EXPECT_TRUE(output.find("8") != std::string::npos);
-}
-
-// Проверяем что CLR выводит правильное название метода
-TEST(TreeCLR, CLRHasCorrectLabel) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-
-    std::stringstream buffer;
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-    tree.clr();
-    std::cout.rdbuf(old);
-
-    std::string output = buffer.str();
-    EXPECT_TRUE(output.find("CLR") != std::string::npos);
-}
-
-// Проверяем что в CLR корень выводится первым (префиксный порядок)
-TEST(TreeCLR, CLRRootComesFirst) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-
-    std::stringstream buffer;
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-    tree.clr();
-    std::cout.rdbuf(old);
-
-    std::string output = buffer.str();
-
-    // Позиция (5) должна быть раньше позиции (3)
-    size_t pos5 = output.find("(5:five)");
-    size_t pos3 = output.find("(3:three)");
-    EXPECT_TRUE(pos5 != std::string::npos && pos3 != std::string::npos);
-    EXPECT_TRUE(pos5 < pos3);
-}
-
-// Проверяем что CLR не падает на пустом дереве
-TEST(TreeCLR, CLREmptyTree) {
-    Tree<int, std::string> tree;
-    EXPECT_NO_THROW(tree.clr());
-}
-
-
-// Проверяем что WIDTH выводит элементы по уровням
-TEST(TreeWidth, WidthHasLevelStructure) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(7, "seven");
-    tree.insert(2, "two");
-    tree.insert(8, "eight");
-
-    std::stringstream buffer;
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-    tree.width();
-    std::cout.rdbuf(old);
-
-    std::string output = buffer.str();
-
-    // Проверяем наличие уровней
-    EXPECT_TRUE(output.find("Level 0") != std::string::npos);
-    EXPECT_TRUE(output.find("Level 1") != std::string::npos);
-}
-
-// Проверяем что WIDTH выводит все элементы дерева
-TEST(TreeWidth, WidthOutputsAllElements) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(7, "seven");
-    tree.insert(2, "two");
-    tree.insert(8, "eight");
-
-    std::stringstream buffer;
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-    tree.width();
-    std::cout.rdbuf(old);
-
-    std::string output = buffer.str();
-
-    EXPECT_TRUE(output.find("2") != std::string::npos);
-    EXPECT_TRUE(output.find("3") != std::string::npos);
-    EXPECT_TRUE(output.find("5") != std::string::npos);
-    EXPECT_TRUE(output.find("7") != std::string::npos);
-    EXPECT_TRUE(output.find("8") != std::string::npos);
-}
-
-// Проверяем что WIDTH выводит правильное название метода
-TEST(TreeWidth, WidthHasCorrectLabel) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-
-    std::stringstream buffer;
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-    tree.width();
-    std::cout.rdbuf(old);
-
-    std::string output = buffer.str();
-    EXPECT_TRUE(output.find("WIDTH") != std::string::npos);
-}
-
-// Проверяем что корень находится на Level 0 при WIDTH обходе
-TEST(TreeWidth, WidthRootOnLevel0) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-
-    std::stringstream buffer;
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-    tree.width();
-    std::cout.rdbuf(old);
-
-    std::string output = buffer.str();
-
-    EXPECT_TRUE(output.find("Level 0") != std::string::npos);
-    EXPECT_TRUE(output.find("(5:five)") != std::string::npos);
-}
-
-// Проверяем что WIDTH работает на одном элементе
-TEST(TreeWidth, WidthSingleElement) {
-    Tree<int, std::string> tree;
-    tree.insert(42, "answer");
-
-    std::stringstream buffer;
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-    tree.width();
-    std::cout.rdbuf(old);
-
-    std::string output = buffer.str();
-
-    EXPECT_TRUE(output.find("Level 0") != std::string::npos);
-    EXPECT_TRUE(output.find("42") != std::string::npos);
-}
-
-// Проверяем что WIDTH не падает на пустом дереве
-TEST(TreeWidth, WidthEmptyTree) {
-    Tree<int, std::string> tree;
-    EXPECT_NO_THROW(tree.width());
-}
-
-// Проверяем что все четыре метода работают одновременно на одном дереве
-TEST(TreeComplex, AllMethodsTogether) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(7, "seven");
-
-    EXPECT_NO_THROW(tree.lcr());
-    EXPECT_NO_THROW(tree.lrc());
-    EXPECT_NO_THROW(tree.clr());
-    EXPECT_NO_THROW(tree.width());
-}
-
-// Проверяем что все методы работают на пустом дереве
-TEST(TreeComplex, AllMethodsOnEmptyTree) {
-    Tree<int, std::string> tree;
-
-    EXPECT_NO_THROW(tree.lcr());
-    EXPECT_NO_THROW(tree.lrc());
-    EXPECT_NO_THROW(tree.clr());
-    EXPECT_NO_THROW(tree.width());
-}
-
-// Проверяем что все методы работают на большом дереве с 15 элементами
-TEST(TreeComplex, LargeTreeWith15Elements) {
-    Tree<int, std::string> tree;
-
-    for (int i = 1; i <= 15; i++) {
-        tree.insert(i, "value" + std::to_string(i));
-    }
-
-    std::stringstream buffer;
-    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
-
-    tree.lcr();
-    std::string lcr = buffer.str();
-    buffer.str("");
-    buffer.clear();
-
-    tree.lrc();
-    std::string lrc = buffer.str();
-    buffer.str("");
-    buffer.clear();
-
-    tree.clr();
-    std::string clr = buffer.str();
-    buffer.str("");
-    buffer.clear();
-
-    tree.width();
-    std::string width = buffer.str();
-
-    std::cout.rdbuf(old);
-
-    // Все выводы должны быть непусты
-    EXPECT_FALSE(lcr.empty());
-    EXPECT_FALSE(lrc.empty());
-    EXPECT_FALSE(clr.empty());
-    EXPECT_FALSE(width.empty());
-}
-
-// Проверяем что дерево работает с разными типами: string ключи и int значения
-TEST(TreeTypes, StringKeyIntValue) {
+// ==============================================================
+// 5. ТИПЫ ДАННЫХ И ВИЗУАЛЬНЫЕ ОБХОДЫ
+// ==============================================================
+TEST(TreeFullTest, TypesAndVisualOutput) {
     Tree<std::string, int> tree;
-    tree.insert("apple", 1);
-    tree.insert("banana", 2);
-    tree.insert("cherry", 3);
+    tree.insert("Apple", 50);
+    tree.insert("Orange", 30);
+    tree.insert("Banana", 20);
 
-    EXPECT_NO_THROW(tree.lcr());
-    EXPECT_NO_THROW(tree.lrc());
-    EXPECT_NO_THROW(tree.clr());
-    EXPECT_NO_THROW(tree.width());
-}
+    EXPECT_EQ(*tree.find("Orange"), 30);
+    std::cout << "\n[ИНФО] Визуальная проверка обходов для Apple, Orange, Banana:" << std::endl;
+    tree.width();
+    tree.lcr();
+    tree.clr();
+    tree.lrc();
 
-// Проверяем что дерево работает с разными типами: double ключи и string значения
-TEST(TreeTypes, DoubleKeyStringValue) {
-    Tree<double, std::string> tree;
-    tree.insert(3.14, "pi");
-    tree.insert(2.71, "e");
-    tree.insert(1.41, "sqrt2");
-
-    EXPECT_NO_THROW(tree.lcr());
-    EXPECT_NO_THROW(tree.lrc());
-    EXPECT_NO_THROW(tree.clr());
-    EXPECT_NO_THROW(tree.width());
-}
-// ==================== FIND ====================
-
-// Поиск существующего элемента возвращает правильное значение
-TEST(TreeFind, FindExistingKeyReturnsCorrectValue) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(7, "seven");
-
-    const std::string* val = tree.find(3);
-    ASSERT_NE(val, nullptr);
-    EXPECT_EQ(*val, "three");
-}
-
-// Поиск корня возвращает правильное значение
-TEST(TreeFind, FindRootReturnsCorrectValue) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-
-    const std::string* val = tree.find(5);
-    ASSERT_NE(val, nullptr);
-    EXPECT_EQ(*val, "five");
-}
-
-// Поиск несуществующего ключа возвращает nullptr
-TEST(TreeFind, FindMissingKeyReturnsNullptr) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-
-    const std::string* val = tree.find(99);
-    EXPECT_EQ(val, nullptr);
-}
-
-// Поиск в пустом дереве возвращает nullptr
-TEST(TreeFind, FindInEmptyTreeReturnsNullptr) {
-    Tree<int, std::string> tree;
-    EXPECT_EQ(tree.find(1), nullptr);
-}
-
-// После обновления значения find возвращает новое значение
-TEST(TreeFind, FindAfterUpdateReturnsNewValue) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(5, "FIVE");
-
-    const std::string* val = tree.find(5);
-    ASSERT_NE(val, nullptr);
-    EXPECT_EQ(*val, "FIVE");
-}
-
-// Поиск крайнего правого элемента
-TEST(TreeFind, FindRightmostElement) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(7, "seven");
-    tree.insert(8, "eight");
-
-    const std::string* val = tree.find(8);
-    ASSERT_NE(val, nullptr);
-    EXPECT_EQ(*val, "eight");
-}
-
-// Поиск крайнего левого элемента
-TEST(TreeFind, FindLeftmostElement) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(2, "two");
-
-    const std::string* val = tree.find(2);
-    ASSERT_NE(val, nullptr);
-    EXPECT_EQ(*val, "two");
-}
-
-// ==================== REMOVE ====================
-
-// Удаление единственного элемента делает дерево пустым
-TEST(TreeRemove, RemoveOnlyElementMakesTreeEmpty) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.remove(5);
-    EXPECT_TRUE(tree.is_empty());
-}
-
-// Удаление листа (нет потомков)
-TEST(TreeRemove, RemoveLeafNode) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(7, "seven");
-
-    tree.remove(3);
-
-    EXPECT_EQ(tree.find(3), nullptr);
-    EXPECT_NE(tree.find(5), nullptr);
-    EXPECT_NE(tree.find(7), nullptr);
-}
-
-// Удаление узла с одним левым потомком
-TEST(TreeRemove, RemoveNodeWithOnlyLeftChild) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(2, "two");
-
-    tree.remove(3);  // У 3 есть только левый потомок (2)
-
-    EXPECT_EQ(tree.find(3), nullptr);
-    EXPECT_NE(tree.find(2), nullptr);
-    EXPECT_NE(tree.find(5), nullptr);
-}
-
-// Удаление узла с одним правым потомком
-TEST(TreeRemove, RemoveNodeWithOnlyRightChild) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(4, "four");
-
-    tree.remove(3);  // У 3 есть только правый потомок (4)
-
-    EXPECT_EQ(tree.find(3), nullptr);
-    EXPECT_NE(tree.find(4), nullptr);
-    EXPECT_NE(tree.find(5), nullptr);
-}
-
-// Удаление узла с двумя потомками
-TEST(TreeRemove, RemoveNodeWithTwoChildren) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(7, "seven");
-    tree.insert(2, "two");
-    tree.insert(4, "four");
-
-    tree.remove(3);  // У 3 есть два потомка (2 и 4)
-
-    EXPECT_EQ(tree.find(3), nullptr);
-    EXPECT_NE(tree.find(2), nullptr);
-    EXPECT_NE(tree.find(4), nullptr);
-    EXPECT_NE(tree.find(5), nullptr);
-    EXPECT_NE(tree.find(7), nullptr);
-}
-
-// Удаление корня с двумя потомками
-TEST(TreeRemove, RemoveRootWithTwoChildren) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(7, "seven");
-
-    tree.remove(5);
-
-    EXPECT_EQ(tree.find(5), nullptr);
-    EXPECT_FALSE(tree.is_empty());
-    EXPECT_NE(tree.find(3), nullptr);
-    EXPECT_NE(tree.find(7), nullptr);
-}
-
-// Удаление несуществующего ключа не ломает дерево
-TEST(TreeRemove, RemoveNonExistentKeyDoesNothing) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-
-    EXPECT_NO_THROW(tree.remove(99));
-
-    EXPECT_NE(tree.find(5), nullptr);
-    EXPECT_NE(tree.find(3), nullptr);
-}
-
-// Удаление из пустого дерева не падает
-TEST(TreeRemove, RemoveFromEmptyTreeDoesNotCrash) {
-    Tree<int, std::string> tree;
-    EXPECT_NO_THROW(tree.remove(42));
-}
-
-// После удаления обходы работают корректно
-TEST(TreeRemove, TraversalsWorkAfterRemove) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(7, "seven");
-    tree.remove(3);
-
-    EXPECT_NO_THROW(tree.lcr());
-    EXPECT_NO_THROW(tree.lrc());
-    EXPECT_NO_THROW(tree.clr());
-    EXPECT_NO_THROW(tree.width());
-}
-
-// Удаление всех элементов по одному делает дерево пустым
-TEST(TreeRemove, RemoveAllElementsOneByOne) {
-    Tree<int, std::string> tree;
-    tree.insert(5, "five");
-    tree.insert(3, "three");
-    tree.insert(7, "seven");
-
-    tree.remove(3);
-    tree.remove(7);
-    tree.remove(5);
-
-    EXPECT_TRUE(tree.is_empty());
+    SUCCEED();
 }

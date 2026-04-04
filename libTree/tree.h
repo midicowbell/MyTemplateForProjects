@@ -7,6 +7,7 @@ struct Node {
     std::pair<Tkey, Tvalue> data;
     Node* left;
     Node* right;
+
 public:
     Node(const Tkey& key, const Tvalue& value)
         : data(key, value), left(nullptr), right(nullptr) {
@@ -24,18 +25,21 @@ private:
         std::cout << "(" << node->data.first << ":" << node->data.second << ") ";
         lcr_rec(node->right);
     }
+
     void lrc_rec(Node<Tkey, Tvalue>* node) const {
         if (node == nullptr) return;
         lrc_rec(node->left);
         lrc_rec(node->right);
         std::cout << "(" << node->data.first << ":" << node->data.second << ") ";
     }
+
     void clr_rec(Node<Tkey, Tvalue>* node) const {
         if (node == nullptr) return;
         std::cout << "(" << node->data.first << ":" << node->data.second << ") ";
         clr_rec(node->left);
         clr_rec(node->right);
     }
+
     void width_rec() const {
         if (is_empty()) {
             std::cout << "Width: Tree is empty" << std::endl;
@@ -58,46 +62,6 @@ private:
             level++;
         }
     }
-    Node<Tkey, Tvalue>* find_rec(Node<Tkey, Tvalue>* node, const Tkey& key) const {
-        if (node == nullptr) return nullptr;
-        if (key == node->data.first) return node;
-        if (key < node->data.first)  return find_rec(node->left, key);
-        else                         return find_rec(node->right, key);
-    }
-    Node<Tkey, Tvalue>* find_min(Node<Tkey, Tvalue>* node) const {
-        while (node->left != nullptr)
-            node = node->left;
-        return node;
-    }
-    Node<Tkey, Tvalue>* remove_rec(Node<Tkey, Tvalue>* node, const Tkey& key) {
-        if (node == nullptr) return nullptr;
-
-        if (key < node->data.first) {
-            node->left = remove_rec(node->left, key);
-        }
-        else if (key > node->data.first) {
-            node->right = remove_rec(node->right, key);
-        }
-        else {
-            if (node->left == nullptr) {
-                Node<Tkey, Tvalue>* tmp = node->right;
-                delete node;
-                return tmp;
-            }
-            else if (node->right == nullptr) {
-                Node<Tkey, Tvalue>* tmp = node->left;
-                delete node;
-                return tmp;
-            }
-            else {
-                Node<Tkey, Tvalue>* successor = find_min(node->right);
-                node->data = successor->data;
-                node->right = remove_rec(node->right, successor->data.first);
-            }
-        }
-        return node;
-    }
-
     void deleteTree(Node<Tkey, Tvalue>* node) {
         if (node == nullptr) return;
         deleteTree(node->left);
@@ -108,40 +72,106 @@ private:
 public:
     Tree() : _root(nullptr) {}
     ~Tree() { deleteTree(_root); }
-
     void insert(const Tkey& key, const Tvalue& value) {
+        Node<Tkey, Tvalue>* newNode = new Node<Tkey, Tvalue>(key, value);
+
         if (_root == nullptr) {
-            _root = new Node<Tkey, Tvalue>(key, value);
+            _root = newNode;
             return;
         }
+
         std::queue<Node<Tkey, Tvalue>*> q;
         q.push(_root);
+
         while (!q.empty()) {
-            Node<Tkey, Tvalue>* node = q.front();
+            Node<Tkey, Tvalue>* cur = q.front();
             q.pop();
-            if (key < node->data.first) {
-                if (!node->left) { node->left = new Node<Tkey, Tvalue>(key, value); return; }
-                else              q.push(node->left);
-            }
-            else if (key > node->data.first) {
-                if (!node->right) { node->right = new Node<Tkey, Tvalue>(key, value); return; }
-                else               q.push(node->right);
+
+            if (!cur->left) {
+                cur->left = newNode;
+                return;
             }
             else {
-                node->data.second = value;
+                q.push(cur->left);
+            }
+
+            if (!cur->right) {
+                cur->right = newNode;
                 return;
+            }
+            else {
+                q.push(cur->right);
             }
         }
     }
-
     const Tvalue* find(const Tkey& key) const {
-        Node<Tkey, Tvalue>* result = find_rec(_root, key);
-        if (result == nullptr) return nullptr;
-        return &result->data.second;
+        if (_root == nullptr) return nullptr;
+
+        std::queue<Node<Tkey, Tvalue>*> q;
+        q.push(_root);
+
+        while (!q.empty()) {
+            Node<Tkey, Tvalue>* cur = q.front();
+            q.pop();
+
+            if (cur->data.first == key) {
+                return &cur->data.second;
+            }
+
+            if (cur->left) q.push(cur->left);
+            if (cur->right) q.push(cur->right);
+        }
+        return nullptr;
     }
 
     void remove(const Tkey& key) {
-        _root = remove_rec(_root, key);
+        if (_root == nullptr) return;
+    
+        if (_root->left == nullptr && _root->right == nullptr) {
+            if (_root->data.first == key) {
+                delete _root;
+                _root = nullptr;
+            }
+            return;
+        }
+
+        std::queue<Node<Tkey, Tvalue>*> q;
+        q.push(_root);
+
+        Node<Tkey, Tvalue>* targetNode = nullptr;
+        Node<Tkey, Tvalue>* deepestNode = _root;
+        Node<Tkey, Tvalue>* parentOfDeepest = nullptr;
+
+        
+        while (!q.empty()) {
+            Node<Tkey, Tvalue>* cur = q.front();
+            q.pop();
+
+            if (cur->data.first == key) {
+                targetNode = cur;
+            }
+
+            if (cur->left) {
+                parentOfDeepest = cur;
+                deepestNode = cur->left;
+                q.push(cur->left);
+            }
+            if (cur->right) {
+                parentOfDeepest = cur;
+                deepestNode = cur->right;
+                q.push(cur->right);
+            }
+        }
+        if (targetNode != nullptr) {
+            targetNode->data = deepestNode->data;
+            if (parentOfDeepest->right == deepestNode) {
+                parentOfDeepest->right = nullptr;
+            }
+            else if (parentOfDeepest->left == deepestNode) {
+                parentOfDeepest->left = nullptr;
+            }
+            delete deepestNode;
+        }
     }
 
     bool is_empty() const { return _root == nullptr; }
