@@ -10,10 +10,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include(cmake/functions.cmake OPTIONAL)
 include_directories(libTree)
 include_directories(libBSTree)
+include_directories(libAVLtree)
+
 
 # библиотеки
 add_subdirectory(libTree)
 add_subdirectory(libBSTree)
+add_subdirectory(libAVLtree)
 
 # основной исполняемый файл
 add_subdirectory(src)
