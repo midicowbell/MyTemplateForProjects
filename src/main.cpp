@@ -9,12 +9,12 @@ int main() {
 		table.insert(item.first, item.second);
 	}
 	for (const auto& item : dict2) {
-		if (table.find(item.first) == nullptr) {
+		if (table.consist(item.first) == false) {
 			table.insert(item.first, item.second);
 		}
 	}
 
-	table.print();
+	table.print(std::cout);
 	//int* val1 = table.find("hash");
 	//int* val2 = table.find("list");
 	//if (val1 && val2) std::cout << "hash: " << *val1 << "\nlist:"  << *val2<< std::endl;
