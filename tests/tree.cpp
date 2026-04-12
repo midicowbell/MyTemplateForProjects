@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "Tree.h"
 #include "../libBSTree/bstree.h"
+#include "../libAVLtree/avltree.h"
 // ==============================================================
 // 1. БАЗОВЫЕ ОПЕРАЦИИ (ВСТАВКА И ПУСТОТА)
 // ==============================================================
@@ -196,4 +197,103 @@ TEST(BSTreeDeleteTest, DeleteNonExistentKey) {
 
     tree.remove(99); // Не должно вызывать ошибок
     EXPECT_NE(tree.find(10), nullptr);
+}
+
+// ==============================================================
+// 1. БАЗОВЫЕ ОПЕРАЦИИ (ВСТАВКА И ПОИСК)
+// ==============================================================
+
+TEST(AVLTreeTest, InsertAndFind) {
+    AVLTree<int, std::string> tree;
+    EXPECT_TRUE(tree.is_empty());
+
+    tree.insert(10, "ten");
+    tree.insert(20, "twenty");
+    tree.insert(5, "five");
+
+    EXPECT_FALSE(tree.is_empty());
+    ASSERT_NE(tree.find(10), nullptr);
+    EXPECT_EQ(*tree.find(10), "ten");
+    EXPECT_EQ(*tree.find(20), "twenty");
+    EXPECT_EQ(*tree.find(5), "five");
+}
+
+// ==============================================================
+// 2. ПРОВЕРКА БАЛАНСИРОВКИ (ПОВОРОТЫ)
+// ==============================================================
+
+// Случай RR
+TEST(AVLTreeTest, RotationRR) {
+    AVLTree<int, int> tree;
+    tree.insert(10, 10);
+    tree.insert(20, 20);
+    tree.insert(30, 30);
+
+    EXPECT_EQ(tree.height(), 2);
+}
+
+// Случай LL
+TEST(AVLTreeTest, RotationLL) {
+    AVLTree<int, int> tree;
+    tree.insert(30, 30);
+    tree.insert(20, 20);
+    tree.insert(10, 10);
+
+    EXPECT_EQ(tree.height(), 2);
+}
+
+// Случай LR
+TEST(AVLTreeTest, RotationLR) {
+    AVLTree<int, int> tree;
+    tree.insert(30, 30);
+    tree.insert(10, 10);
+    tree.insert(20, 20);
+
+    EXPECT_EQ(tree.height(), 2);
+    EXPECT_NE(tree.find(20), nullptr);
+}
+
+// Случай RL
+TEST(AVLTreeTest, RotationRL) {
+    AVLTree<int, int> tree;
+    tree.insert(10, 10);
+    tree.insert(30, 30);
+    tree.insert(20, 20);
+
+    EXPECT_EQ(tree.height(), 2);
+}
+
+// ==============================================================
+// 3. СТРЕСС-ТЕСТ НА ГАРЯЧУЮ БАЛАНСИРОВКУ
+// ==============================================================
+
+TEST(AVLTreeTest, SequentialInsertStressTest) {
+    AVLTree<int, int> tree;
+    int n = 1000;
+    for (int i = 1; i <= n; ++i) {
+        tree.insert(i, i);
+    }
+
+    EXPECT_LE(tree.height(), 15);
+
+    for (int i = 1; i <= n; ++i) {
+        ASSERT_NE(tree.find(i), nullptr) << "Key " << i << " not found!";
+    }
+}
+
+// ==============================================================
+// 4. ТЕСТЫ УДАЛЕНИЯ (ЕСЛИ МЕТОД REMOVE ГОТОВ)
+// ==============================================================
+
+TEST(AVLTreeTest, RemoveAndRebalance) {
+    AVLTree<int, int> tree;
+    tree.insert(20, 20);
+    tree.insert(10, 10);
+    tree.insert(30, 30);
+    tree.insert(5, 5);
+    tree.remove(30);
+
+    EXPECT_EQ(tree.find(30), nullptr);
+    EXPECT_LE(tree.height(), 2);
+    EXPECT_NE(tree.find(20), nullptr);
 }

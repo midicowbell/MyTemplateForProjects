@@ -12,11 +12,13 @@ template<typename Tkey, typename Tvalue>
 class AVLTree {
 private:
 	AVLNode<Tkey, Tvalue>* _root;
-public:
-	AVLTree() : _root(nullptr) {}
-	bool is_empty() const noexcept {
-		return _root == nullptr;
-	}
+    void clear(AVLNode<Tkey, Tvalue>* node) {
+        if (node != nullptr) {
+            clear(node->_left);
+            clear(node->_right);
+            delete node;
+        }
+    }
     void left_rotate(AVLNode<Tkey, Tvalue>* G) {
         AVLNode<Tkey, Tvalue>* P = G->_right;
         G->_right = P->_left;
@@ -34,7 +36,7 @@ public:
             _root = P;
         }
 
-        G->parent = P;
+        G->_parent = P;
         recalc_height(G);
         recalc_height(P);
     }
@@ -59,14 +61,7 @@ public:
         recalc_height(G);
         recalc_height(P);
     }
-    int get_height(AVLNode<Tkey, Tvalue>* node) const {
-        if (node == nullptr) {
-            return 0;
-        }
-        else {
-            return node->_height;
-        }
-    }
+
     int get_balance(AVLNode<Tkey, Tvalue>* node) const {
         if (node == nullptr) {
             return 0;
@@ -102,5 +97,121 @@ public:
             right_rotate(node); // случай LL
         }
     }
+    int get_height(AVLNode<Tkey, Tvalue>* node) const {
+        if (node == nullptr) {
+            return 0;
+        }
+        else {
+            return node->_height;
+        }
+    }
 
+public:
+	AVLTree() : _root(nullptr) {}
+	bool is_empty() const noexcept {
+		return _root == nullptr;
+	}
+    ~AVLTree() {
+        clear(_root);
+    }
+    
+    void insert(const Tkey& key, const Tvalue& val) {
+        if (_root == nullptr) {
+            _root = new AVLNode<Tkey, Tvalue>{ { key, val }, nullptr, nullptr, nullptr, 1 };
+            return;
+        }
+
+        AVLNode<Tkey, Tvalue>* pCurrent = _root;
+        AVLNode<Tkey, Tvalue>* pParent = nullptr;
+
+        while (pCurrent != nullptr) {
+            pParent = pCurrent;
+            if (key < pCurrent->_data.first) {
+                pCurrent = pCurrent->_left;
+            }
+            else if (key > pCurrent->_data.first) {
+                pCurrent = pCurrent->_right;
+            }
+            else {
+                return; 
+            }
+        }
+        AVLNode<Tkey, Tvalue>* pNew = new AVLNode<Tkey, Tvalue>{ {key, val}, nullptr, nullptr, pParent, 1 };
+
+        if (key < pParent->_data.first) {
+            pParent->_left = pNew;
+        }
+        else {
+            pParent->_right = pNew;
+        }
+
+        AVLNode<Tkey, Tvalue>* pBalance = pParent;
+        while (pBalance != nullptr) {
+            balance(pBalance);
+            pBalance = pBalance->_parent; 
+        }
+    }
+    Tvalue* find(const Tkey& key) {
+        AVLNode<Tkey, Tvalue>* pCurrent = _root;
+
+        while (pCurrent != nullptr) {
+            if (key == pCurrent->_data.first) {
+                return &(pCurrent->_data.second);
+            }
+
+            if (key < pCurrent->_data.first) {
+                pCurrent = pCurrent->_left;
+            }
+            else {
+                pCurrent = pCurrent->_right;
+            }
+        }
+        return nullptr;
+    }
+    int height() const { return get_height(_root); }
+    void remove(const Tkey& key) {
+        AVLNode<Tkey, Tvalue>* pNode = _root;
+        while (pNode != nullptr && pNode->_data.first != key) {
+            if (key < pNode->_data.first) pNode = pNode->_left;
+            else pNode = pNode->_right;
+        }
+
+        if (pNode == nullptr) return;
+
+        AVLNode<Tkey, Tvalue>* pDelete = nullptr;
+        if (pNode->_left == nullptr || pNode->_right == nullptr) {
+            pDelete = pNode; 
+        }
+        else {
+            pDelete = pNode->_right;
+            while (pDelete->_left != nullptr) pDelete = pDelete->_left;
+
+            pNode->_data = pDelete->_data;
+        }
+        AVLNode<Tkey, Tvalue>* pChild = (pDelete->_left != nullptr) ? pDelete->_left : pDelete->_right;
+        AVLNode<Tkey, Tvalue>* pBalanceStart = pDelete->_parent;
+
+        if (pChild != nullptr) {
+            pChild->_parent = pDelete->_parent;
+        }
+
+        if (pDelete->_parent == nullptr) {
+            _root = pChild;
+        }
+        else {
+            if (pDelete->_parent->_left == pDelete) {
+                pDelete->_parent->_left = pChild;
+            }
+            else {
+                pDelete->_parent->_right = pChild;
+            }
+        }
+
+        delete pDelete;
+        AVLNode<Tkey, Tvalue>* pTemp = pBalanceStart;
+        while (pTemp != nullptr) {
+            balance(pTemp); 
+            pTemp = pTemp->_parent;
+        }
+    }
 };
