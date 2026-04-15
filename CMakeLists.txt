@@ -11,12 +11,14 @@ include(cmake/functions.cmake OPTIONAL)
 include_directories(libTree)
 include_directories(libBSTree)
 include_directories(libAVLtree)
+include_directories(libGraph)
 
 
 # библиотеки
 add_subdirectory(libTree)
 add_subdirectory(libBSTree)
 add_subdirectory(libAVLtree)
+add_subdirectory(libGraph)
 
 # основной исполняемый файл
 add_subdirectory(src)
