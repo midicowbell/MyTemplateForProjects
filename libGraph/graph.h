@@ -112,4 +112,53 @@ public:
 			}
 		}
 	}
+	void djikrstra(T start, T end) {
+		int start = int(start);
+		int end = int(end);
+		if (start >= count_vertices || end >= count_vertices) {
+			throw std::logic_error("Таких вериш не сущесвуют\n");
+			return;
+		}
+		const int INF = 1e9 + 7;
+		std::vector<int> ans(count_vertices, INF);
+		std::vector<int> pr(count_vertices, INF);
+		std::priority_queue<std::pair<int, int>, std::vector<pair<int, int>>, std::greater<pair<int, int>>> q;
+		q.push({ 0, start });
+		while (!q.empty()) {
+			std::pair<int, int> c = q.top();
+			q.pop();
+			int dst = c.first;
+			int v = c.second;
+			if (ans[v] < dst) {
+				continue;
+			}
+			auto it = vertices[v].neighbors.begin();
+			while (it != vertices[v].neighbors.end()) {
+				int u = (int)it->to;
+				int len_vu = it->weight;
+				int n_dst = dst + len_vu; // текущий пробег(сколько прошли + новая дорога)
+				if (n_dst < ans[u]) {
+					ans[i] = n_dst;
+					pr[u] = v;
+					q.push({n_dst, u})
+				}
+				++it;
+			}
+		}
+		if (ans[end] == INF) { return; }
+		std::vector<int> path;
+		int cur = end;
+		path.push_back(cur);
+		while (pr[cur] != -1) {
+			cur = pr[cur];
+			path.push_back(cur);
+		}
+		std::reverse(path.begin(), path.end());
+		std::cout << "Кратчайший пусть от " << start << "до " << end << " раввен:" << ans[end] << "\n";
+		for (size_t i = 0; i < path.size(); i++) {
+			std::cout << path[i];
+			if (i != path.size() - 1) std::cout << " -> ";
+		}
+		std::cout << "\n";
+	}
 };
