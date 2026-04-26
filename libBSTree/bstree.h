@@ -26,6 +26,40 @@ private:
         }
         return pNode;
     }
+private:
+    BSTNode<Tkey, Tvalue>* remove_rec(BSTNode<Tkey, Tvalue>* node, const Tkey& key) {
+        if (node == nullptr) return nullptr;
+
+        if (key < node->data.first) {
+            node->left = remove_rec(node->left, key); 
+        }
+        else if (key > node->data.first) {
+            node->right = remove_rec(node->right, key); 
+        }
+        else {
+
+            if (node->left == nullptr) {
+                BSTNode<Tkey, Tvalue>* temp = node->right;
+                delete node;
+                return temp;
+            }
+            else if (node->right == nullptr) {
+                BSTNode<Tkey, Tvalue>* temp = node->left;
+                delete node;
+                return temp; 
+            }
+            // оба ребенка 
+            BSTNode<Tkey, Tvalue>* minNode = node->right;
+            while (minNode->left != nullptr) {
+                minNode = minNode->left;
+            }
+
+            node->data = minNode->data;
+            node->right = remove_rec(node->right, minNode->data.first);
+        }
+
+        return node;
+    }
 
 public:
     BSTree() : _root(nullptr) {}
@@ -70,45 +104,6 @@ public:
         }
     }
     void remove(const Tkey& key) {
-        BSTNode<Tkey, Tvalue>* pCurrent = _root;
-        BSTNode<Tkey, Tvalue>* pParent = nullptr;
-
-        while (pCurrent != nullptr && pCurrent->data.first != key) {
-            pParent = pCurrent;
-            if (key < pCurrent->data.first)
-                pCurrent = pCurrent->left;
-            else
-                pCurrent = pCurrent->right;
-        }
-
-        if (pCurrent == nullptr) return;
-
-        if (pCurrent->left != nullptr && pCurrent->right != nullptr) {
-            BSTNode<Tkey, Tvalue>* pSuccessor = pCurrent->right;
-            BSTNode<Tkey, Tvalue>* pSuccessorParent = pCurrent;
-
-            while (pSuccessor->left != nullptr) {
-                pSuccessorParent = pSuccessor;
-                pSuccessor = pSuccessor->left;
-            }
-
-            pCurrent->data = pSuccessor->data;
-            pParent = pSuccessorParent;
-            pCurrent = pSuccessor;
-        }
-
-        BSTNode<Tkey, Tvalue>* pChild = (pCurrent->left != nullptr) ? pCurrent->left : pCurrent->right;
-
-        if (pParent == nullptr) {
-            _root = pChild;
-        }
-        else {
-            if (pParent->left == pCurrent)
-                pParent->left = pChild;
-            else
-                pParent->right = pChild;
-        }
-
-        delete pCurrent;
+        _root = remove_rec(_root, key);
     }
 };
