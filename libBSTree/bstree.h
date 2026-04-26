@@ -73,7 +73,6 @@ public:
         BSTNode<Tkey, Tvalue>* pCurrent = _root;
         BSTNode<Tkey, Tvalue>* pParent = nullptr;
 
-        // 1. Поиск удаляемого узла и его родителя
         while (pCurrent != nullptr && pCurrent->data.first != key) {
             pParent = pCurrent;
             if (key < pCurrent->data.first)
@@ -84,7 +83,6 @@ public:
 
         if (pCurrent == nullptr) return;
 
-        // 2. Случай: У узла два потомка
         if (pCurrent->left != nullptr && pCurrent->right != nullptr) {
             BSTNode<Tkey, Tvalue>* pSuccessor = pCurrent->right;
             BSTNode<Tkey, Tvalue>* pSuccessorParent = pCurrent;
@@ -99,7 +97,6 @@ public:
             pCurrent = pSuccessor;
         }
 
-        // 3. Случай: У узла один потомок или он — лист [4, 5]
         BSTNode<Tkey, Tvalue>* pChild = (pCurrent->left != nullptr) ? pCurrent->left : pCurrent->right;
 
         if (pParent == nullptr) {

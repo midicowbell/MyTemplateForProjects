@@ -2,9 +2,7 @@
 #include "Tree.h"
 #include "../libBSTree/bstree.h"
 #include "../libAVLtree/avltree.h"
-// ==============================================================
-// 1. БАЗОВЫЕ ОПЕРАЦИИ (ВСТАВКА И ПУСТОТА)
-// ==============================================================
+//БАЗОВЫЕ ОПЕРАЦИИ (ВСТАВКА И ПУСТОТА)
 TEST(TreeFullTest, BasicInsertAndEmpty) {
     Tree<int, std::string> tree;
     EXPECT_TRUE(tree.is_empty());
@@ -15,9 +13,8 @@ TEST(TreeFullTest, BasicInsertAndEmpty) {
     EXPECT_EQ(*tree.find(1), "one");
 }
 
-// ==============================================================
-// 2. ПОИСК (FIND)
-// ==============================================================
+// FIND
+
 TEST(TreeFullTest, SearchOperations) {
     Tree<int, std::string> tree;
     tree.insert(10, "root");
@@ -30,9 +27,7 @@ TEST(TreeFullTest, SearchOperations) {
     EXPECT_EQ(tree.find(999), nullptr);
 }
 
-// ==============================================================
-// 3. ЦИКЛ: ВСТАВКА -> УДАЛЕНИЕ -> ВСТАВКА
-// ==============================================================
+//ВСТАВКА -> УДАЛЕНИЕ -> ВСТАВКА
 TEST(TreeFullTest, InsertRemoveInsertCycle) {
     Tree<int, std::string> tree;
     tree.insert(1, "A");
@@ -52,9 +47,7 @@ TEST(TreeFullTest, InsertRemoveInsertCycle) {
     EXPECT_NE(tree.find(4), nullptr);
 }
 
-// ==============================================================
-// 4. УДАЛЕНИЕ ДО ПУСТОТЫ
-// ==============================================================
+// УДАЛЕНИЕ ДО ПУСТОТЫ
 TEST(TreeFullTest, RemoveToEmpty) {
     Tree<int, std::string> tree;
 
@@ -69,9 +62,8 @@ TEST(TreeFullTest, RemoveToEmpty) {
     EXPECT_EQ(*tree.find(300), "Z");
 }
 
-// ==============================================================
-// 5. ТИПЫ ДАННЫХ И ВИЗУАЛЬНЫЕ ОБХОДЫ
-// ==============================================================
+// ТИПЫ ДАННЫХ И ВИЗУАЛЬНЫЕ ОБХОДЫ
+
 TEST(TreeFullTest, TypesAndVisualOutput) {
     Tree<std::string, int> tree;
     tree.insert("Apple", 50);
@@ -88,13 +80,13 @@ TEST(TreeFullTest, TypesAndVisualOutput) {
     SUCCEED();
 }
 
-// Тест 1: Проверка начального состояния (пустое дерево)
+// Проверка начального состояния (пустое дерево)
 TEST(BSTreeTest, NewTreeIsEmpty) {
     BSTree<int, std::string> tree;
     EXPECT_TRUE(tree.is_empty());
 }
 
-// Тест 2: Проверка вставки одного элемента
+// Проверка вставки одного элемента
 TEST(BSTreeTest, InsertSingleElement) {
     BSTree<int, std::string> tree;
     tree.insert(10, "ten");
@@ -102,19 +94,19 @@ TEST(BSTreeTest, InsertSingleElement) {
     EXPECT_FALSE(tree.is_empty());
 
     std::string* value = tree.find(10);
-    ASSERT_NE(value, nullptr); // Указатель не должен быть нулевым
+    ASSERT_NE(value, nullptr);
     EXPECT_EQ(*value, "ten");
 }
 
-// Тест 3: Поиск несуществующего ключа
+// Поиск несуществующего ключа
 TEST(BSTreeTest, FindNonExistentKey) {
     BSTree<int, std::string> tree;
     tree.insert(10, "ten");
 
-    EXPECT_EQ(tree.find(20), nullptr); // Должен вернуть nullptr
+    EXPECT_EQ(tree.find(20), nullptr);
 }
 
-// Тест 4: Вставка нескольких элементов и сохранение свойств поиска
+// Вставка нескольких элементов и сохранение свойств поиска
 TEST(BSTreeTest, InsertMultipleElements) {
     BSTree<int, int> tree;
     tree.insert(50, 500);
@@ -123,7 +115,6 @@ TEST(BSTreeTest, InsertMultipleElements) {
     tree.insert(20, 200);
     tree.insert(40, 400);
 
-    // Проверяем наличие всех ключей
     EXPECT_EQ(*tree.find(50), 500);
     EXPECT_EQ(*tree.find(30), 300);
     EXPECT_EQ(*tree.find(70), 700);
@@ -131,17 +122,17 @@ TEST(BSTreeTest, InsertMultipleElements) {
     EXPECT_EQ(*tree.find(40), 400);
 }
 
-// Тест 5: Проверка на отсутствие дубликатов (согласно логике insert из лекций)
+// Проверка на отсутствие дубликатов (согласно логике insert из лекций)
 TEST(BSTreeTest, InsertDuplicateKeyDoesNothing) {
     BSTree<int, std::string> tree;
     tree.insert(1, "original");
-    tree.insert(1, "duplicate"); // Вторая вставка не должна сработать
+    tree.insert(1, "duplicate");
 
     std::string* value = tree.find(1);
     ASSERT_NE(value, nullptr);
-    EXPECT_EQ(*value, "original"); // Значение не должно измениться
+    EXPECT_EQ(*value, "original");
 }
-// Тест удаления листа [1]
+// Тест удаления листа
 TEST(BSTreeDeleteTest, DeleteLeaf) {
     BSTree<int, std::string> tree;
     tree.insert(10, "root");
@@ -152,19 +143,19 @@ TEST(BSTreeDeleteTest, DeleteLeaf) {
     EXPECT_NE(tree.find(10), nullptr);
 }
 
-// Тест удаления узла с одним потомком [2]
+// Тест удаления узла с одним потомком 
 TEST(BSTreeDeleteTest, DeleteNodeWithOneChild) {
     BSTree<int, std::string> tree;
     tree.insert(10, "root");
     tree.insert(5, "parent");
-    tree.insert(3, "child"); // Узел 5 имеет одного потомка 3
+    tree.insert(3, "child");
 
     tree.remove(5);
     EXPECT_EQ(tree.find(5), nullptr);
-    EXPECT_NE(tree.find(3), nullptr); // 3 должен "подтянуться" на место 5
+    EXPECT_NE(tree.find(3), nullptr);
 }
 
-// Тест удаления узла с двумя потомками [2]
+// Тест удаления узла с двумя потомками
 TEST(BSTreeDeleteTest, DeleteNodeWithTwoChildren) {
     BSTree<int, std::string> tree;
     tree.insert(10, "root");
@@ -199,9 +190,8 @@ TEST(BSTreeDeleteTest, DeleteNonExistentKey) {
     EXPECT_NE(tree.find(10), nullptr);
 }
 
-// ==============================================================
-// 1. БАЗОВЫЕ ОПЕРАЦИИ (ВСТАВКА И ПОИСК)
-// ==============================================================
+// БАЗОВЫЕ ОПЕРАЦИИ (ВСТАВКА И ПОИСК)
+
 
 TEST(AVLTreeTest, InsertAndFind) {
     AVLTree<int, std::string> tree;
@@ -218,9 +208,8 @@ TEST(AVLTreeTest, InsertAndFind) {
     EXPECT_EQ(*tree.find(5), "five");
 }
 
-// ==============================================================
-// 2. ПРОВЕРКА БАЛАНСИРОВКИ (ПОВОРОТЫ)
-// ==============================================================
+//ПРОВЕРКА БАЛАНСИРОВКИ (ПОВОРОТЫ)
+
 
 // Случай RR
 TEST(AVLTreeTest, RotationRR) {
@@ -263,9 +252,7 @@ TEST(AVLTreeTest, RotationRL) {
     EXPECT_EQ(tree.height(), 2);
 }
 
-// ==============================================================
-// 3. СТРЕСС-ТЕСТ НА ГАРЯЧУЮ БАЛАНСИРОВКУ
-// ==============================================================
+// СТРЕСС-ТЕСТ
 
 TEST(AVLTreeTest, SequentialInsertStressTest) {
     AVLTree<int, int> tree;
@@ -281,9 +268,7 @@ TEST(AVLTreeTest, SequentialInsertStressTest) {
     }
 }
 
-// ==============================================================
-// 4. ТЕСТЫ УДАЛЕНИЯ (ЕСЛИ МЕТОД REMOVE ГОТОВ)
-// ==============================================================
+// ТЕСТЫ УДАЛЕНИЯ
 
 TEST(AVLTreeTest, RemoveAndRebalance) {
     AVLTree<int, int> tree;

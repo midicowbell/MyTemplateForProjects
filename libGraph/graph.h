@@ -154,7 +154,7 @@ public:
 			path.push_back(cur);
 		}
 		std::reverse(path.begin(), path.end());
-		std::cout << "Кратчайший пусть от " << start << "до " << end << " раввен:" << ans[end] << "\n";
+		std::cout << "Кратчайший пусть от " << start << "до " << end << " равен:" << ans[end] << "\n";
 		for (size_t i = 0; i < path.size(); i++) {
 			std::cout << path[i];
 			if (i != path.size() - 1) std::cout << " -> ";
