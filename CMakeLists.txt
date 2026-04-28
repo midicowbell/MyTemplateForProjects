@@ -11,11 +11,13 @@ include_directories(libUnsortedTableOnVec)
 include_directories(lib_list)
 include_directories(libSortedTableOnVec)
 include_directories(libUnsortedTableOnList)
+include_directories(libBSTree)
 
 add_subdirectory(libITable)
 add_subdirectory(libUnsortedTableOnVec)
 add_subdirectory(libSortedTableOnVec)
 add_subdirectory(libUnsortedTableOnList)
+add_subdirectory(libSortedTableOnBST)
 add_subdirectory(src)
 
 option(BUILD_TESTS "Build unit tests?" ON)

@@ -30,7 +30,7 @@ public:
 		}
 		insert(key, value);
 	}
-	Tvalue& find(const Tkey& key) const override {
+	Tvalue& find(const Tkey& key) override {
 		for (auto it = _list.begin(); it != _list.end(); ++it) {
 			if ((*it).first == key) {
 				return (*it).second;

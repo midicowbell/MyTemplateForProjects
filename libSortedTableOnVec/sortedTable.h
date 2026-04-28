@@ -10,7 +10,7 @@ private:
 	Tvector<std::pair<Tkey, Tvalue>> _rows;
 public:
 	SortedTableOnVec() {}
-	virtual ~SortedTableOnVec() = default;
+	~SortedTableOnVec() override = default;
 	size_t binary_search(const Tkey& key) {
 		size_t left = 0;
 		size_t right = _rows.size();
@@ -51,7 +51,7 @@ public:
 		}
 		return false;
 	}
-	Tvalue& find(const Tkey& key) const override {
+	Tvalue& find(const Tkey& key) override {
 		size_t left = 0;
 		size_t right = _rows.size();
 		while (left < right) {

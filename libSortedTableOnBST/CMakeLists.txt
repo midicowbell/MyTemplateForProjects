@@ -1,0 +1,2 @@
+add_library(libSortedTableOnBST tabesOnBST.cpp)
+target_include_directories(libSortedTableOnBST PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

@@ -1,9 +1,20 @@
 ﻿#include <gtest/gtest.h>
-#include "UnsortedTable.h"
-#include "sortedTable.h"
-#include "unsortedTableOnList.h"
+#include "../libSortedTableOnVec/sortedTable.h"
+#include "../libUnsortedTableOnVec/UnsortedTable.h"
+#include "../libSortedTableOnVec/sortedTable.h"
+#include "../libITable/itable.h"
+#include "../libUnsortedTableOnList/unsortedTableOnList.h"
+#include "../libSortedTableOnBST/tabesOnBST.h"
 #include <string>
 #include <ostream>
+#include <algorithm>
+#include <random>
+#include <vector>
+
+class TreeTableAdvancedTest : public ::testing::Test {
+protected:
+    TableBST<int, std::string> table;
+};
 
 // Тест 1: Вставка и поиск
 TEST(UnsortedTableTest, InsertAndFind) {
@@ -263,5 +274,108 @@ TEST(UnsortedTableOnListTest, PrintDoesNotCrash) {
 
     std::ostringstream os;
     EXPECT_NO_THROW(t.print(os));
+}
+
+
+
+TEST_F(TreeTableAdvancedTest, FindReturnsModifiableReference) {
+    table.insert(1, "Original");
+
+    std::string& ref = table.find(1);
+    ref = "ChangedViaReference";
+    EXPECT_EQ(table.find(1), "ChangedViaReference");
+}
+
+// --- 2. ТЕСТ ВЫРОЖДЕННОГО ДЕРЕВА ("СОСИСКА") ---
+TEST_F(TreeTableAdvancedTest, LongChainSequentialInsert) {
+    for (int i = 0; i < 100; ++i) {
+        table.insert(i, "val_" + std::to_string(i));
+    }
+
+    EXPECT_EQ(table.find(0), "val_0");   
+    EXPECT_EQ(table.find(99), "val_99"); 
+    EXPECT_TRUE(table.consist(50));
+}
+
+// --- 3. ТЕСТ СЛОЖНОГО УДАЛЕНИЯ (Узел с двумя детьми) ---
+TEST_F(TreeTableAdvancedTest, RemoveNodeWithTwoChildren) {
+    /* Структура:
+          50
+         /  \
+        30   70
+       / \   / \
+      20  40 60 80
+    */
+    table.insert(50, "root");
+    table.insert(30, "L");
+    table.insert(70, "R");
+    table.insert(20, "LL");
+    table.insert(40, "LR");
+    table.insert(60, "RL");
+    table.insert(80, "RR");
+
+    table.erase(50);
+
+    EXPECT_FALSE(table.consist(50));
+    EXPECT_EQ(table.find(60), "RL");
+    EXPECT_EQ(table.find(30), "L"); 
+    EXPECT_EQ(table.find(70), "R"); 
+}
+
+// --- 4. ТЕСТ НА СТРЕСС И РАНДОМ ---
+TEST_F(TreeTableAdvancedTest, StressRandomInsertErase) {
+    std::vector<int> keys;
+    for (int i = 0; i < 200; ++i) keys.push_back(i);
+
+    auto rd = std::random_device{};
+    auto rng = std::default_random_engine{ rd() };
+    std::shuffle(keys.begin(), keys.end(), rng);
+
+    for (int k : keys) table.insert(k, "v" + std::to_string(k));
+
+    std::shuffle(keys.begin(), keys.end(), rng);
+    for (int i = 0; i < 100; ++i) {
+        table.erase(keys[i]);
+        EXPECT_FALSE(table.consist(keys[i]));
+    }
+
+    for (int i = 100; i < 200; ++i) {
+        EXPECT_TRUE(table.consist(keys[i]));
+        EXPECT_EQ(table.find(keys[i]), "v" + std::to_string(keys[i]));
+    }
+}
+
+//  ТЕСТ REPLACE
+TEST_F(TreeTableAdvancedTest, ReplaceLogicComprehensive) {
+
+    table.insert(10, "Initial");
+    table.replace(10, "Updated");
+    EXPECT_EQ(table.find(10), "Updated");
+    EXPECT_THROW(table.replace(20, "New"), std::out_of_range);
+}
+
+// ТЕСТ ИСКЛЮЧЕНИЙ НА ПУСТОЙ ТАБЛИЦЕ
+TEST_F(TreeTableAdvancedTest, EmptyTableExceptions) {
+    EXPECT_THROW(table.find(10), std::out_of_range);
+    EXPECT_NO_THROW(table.erase(10)); 
+    EXPECT_TRUE(table.is_empty());
+}
+
+// ТЕСТ ПЕЧАТИ
+TEST_F(TreeTableAdvancedTest, SortingIntegrityInPrint) {
+    std::vector<int> input = { 40, 10, 50, 20, 30 };
+    for (int x : input) table.insert(x, ".");
+
+    std::ostringstream os;
+    table.print(os);
+    std::string s = os.str();
+
+    size_t p10 = s.find("10");
+    size_t p20 = s.find("20");
+    size_t p30 = s.find("30");
+    size_t p40 = s.find("40");
+    size_t p50 = s.find("50");
+
+    EXPECT_TRUE(p10 < p20 && p20 < p30 && p30 < p40 && p40 < p50);
 }
 
