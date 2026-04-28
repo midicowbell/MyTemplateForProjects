@@ -9,9 +9,12 @@ include_directories(lib)
 include_directories(libTvector) # Исправил регистр v
 include_directories(libUnsortedTableOnVec)
 include_directories(libAlgos)
+include_directories(libGraph)
+include_directories(lib_dsu)
 
 add_subdirectory(libAlgos)
 add_subdirectory(lib_dsu)
+add_subdirectory(libGraph)
 add_subdirectory(src)
 
 option(BUILD_TESTS "Build unit tests?" ON)

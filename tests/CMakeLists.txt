@@ -3,6 +3,7 @@ add_executable(tests
     test_example.cpp
     test_itable.cpp
     test_unsortedtable.cpp
+    dsu.cpp
 )
 
 # 2. Подключаем библиотеки
