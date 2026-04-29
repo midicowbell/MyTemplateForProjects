@@ -12,6 +12,7 @@ include_directories(lib_list)
 include_directories(libSortedTableOnVec)
 include_directories(libUnsortedTableOnList)
 include_directories(libBSTree)
+include_directories(libAVLtree)
 
 add_subdirectory(libITable)
 add_subdirectory(libUnsortedTableOnVec)

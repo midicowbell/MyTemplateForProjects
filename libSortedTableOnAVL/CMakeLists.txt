@@ -1,0 +1,6 @@
+add_library(libSortedTableOnAVL UnsortedTableOnList.cpp)
+
+
+target_link_libraries(libSortedTableOnAVL PUBLIC itable)
+target_link_libraries(libSortedTableOnAVL PUBLIC libAVLtree)
+target_include_directories(libSortedTableOnAVL PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

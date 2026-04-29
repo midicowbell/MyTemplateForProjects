@@ -5,6 +5,7 @@
 #include "../libITable/itable.h"
 #include "../libUnsortedTableOnList/unsortedTableOnList.h"
 #include "../libSortedTableOnBST/tabesOnBST.h"
+#include "../libSortedTableOnAVL/tableAVL.h"
 #include <string>
 #include <ostream>
 #include <algorithm>
@@ -14,6 +15,10 @@
 class TreeTableAdvancedTest : public ::testing::Test {
 protected:
     TableBST<int, std::string> table;
+};
+class TableAVLAdvancedTest : public ::testing::Test {
+protected:
+    TableAVL<int, std::string> table;
 };
 
 // Тест 1: Вставка и поиск
@@ -379,3 +384,140 @@ TEST_F(TreeTableAdvancedTest, SortingIntegrityInPrint) {
     EXPECT_TRUE(p10 < p20 && p20 < p30 && p30 < p40 && p40 < p50);
 }
 
+
+
+// ТЕСТЫ БАЛАНСИРОВКИ (ПОВОРОТЫ)
+
+TEST_F(TableAVLAdvancedTest, RotationLL) {
+    table.insert(30, "A");
+    table.insert(20, "B");
+    table.insert(10, "C"); 
+
+    EXPECT_TRUE(table.consist(10));
+    EXPECT_TRUE(table.consist(20));
+    EXPECT_TRUE(table.consist(30));
+    EXPECT_EQ(table.find(20), "B");
+}
+
+TEST_F(TableAVLAdvancedTest, RotationRR) {
+    table.insert(10, "A");
+    table.insert(20, "B");
+    table.insert(30, "C"); 
+
+    EXPECT_TRUE(table.consist(10));
+    EXPECT_TRUE(table.consist(20));
+    EXPECT_TRUE(table.consist(30));
+}
+
+TEST_F(TableAVLAdvancedTest, RotationLR) {
+    table.insert(30, "A");
+    table.insert(10, "B");
+    table.insert(20, "C");
+
+    EXPECT_TRUE(table.consist(10));
+    EXPECT_TRUE(table.consist(20));
+    EXPECT_TRUE(table.consist(30));
+}
+
+TEST_F(TableAVLAdvancedTest, RotationRL) {
+    table.insert(10, "A");
+    table.insert(30, "B");
+    table.insert(20, "C");
+
+    EXPECT_TRUE(table.consist(10));
+    EXPECT_TRUE(table.consist(20));
+    EXPECT_TRUE(table.consist(30));
+}
+
+// УДАЛЕНИЕ С КАСКАДНОЙ БАЛАНСИРОВКОЙ
+TEST_F(TableAVLAdvancedTest, EraseWithCascadingBalance) {
+  
+    std::vector<int> keys = { 50, 25, 75, 10, 30, 60, 80, 5, 15, 27, 35 };
+    for (int k : keys) {
+        table.insert(k, std::to_string(k));
+    }
+    table.erase(80);
+    table.erase(75);
+    table.erase(60);
+    std::vector<int> remaining = { 50, 25, 10, 30, 5, 15, 27, 35 };
+    for (int k : remaining) {
+        EXPECT_TRUE(table.consist(k)) << "Key " << k << " is missing after cascading delete!";
+    }
+}
+
+// СТРЕСС-ТЕСТ: ПОСЛЕДОВАТЕЛЬНАЯ ВСТАВКА
+TEST_F(TableAVLAdvancedTest, MassiveSequentialInsertAndErase) {
+    const int N = 10000;
+    for (int i = 0; i < N; ++i) {
+        table.insert(i, "val");
+    }
+
+    EXPECT_EQ(table.find(0), "val");
+    EXPECT_EQ(table.find(N - 1), "val");
+    EXPECT_EQ(table.find(N / 2), "val");
+
+    for (int i = 0; i < N; i += 2) {
+        table.erase(i);
+    }
+
+    EXPECT_FALSE(table.consist(0));
+    EXPECT_TRUE(table.consist(1));
+    EXPECT_FALSE(table.consist(N - 2));
+    EXPECT_TRUE(table.consist(N - 1));
+}
+
+//СТРЕСС-ТЕСТ С РАНДОМОМ
+TEST_F(TableAVLAdvancedTest, StressRandomInsertErase) {
+    std::vector<int> keys;
+    const int SIZE = 1000;
+    for (int i = 0; i < SIZE; ++i) keys.push_back(i);
+
+    auto rd = std::random_device{};
+    auto rng = std::default_random_engine{ rd() };
+
+    std::shuffle(keys.begin(), keys.end(), rng);
+    for (int k : keys) {
+        table.insert(k, "v" + std::to_string(k));
+    }
+
+    std::shuffle(keys.begin(), keys.end(), rng);
+    for (int i = 0; i < SIZE / 2; ++i) {
+        table.erase(keys[i]);
+        EXPECT_FALSE(table.consist(keys[i]));
+    }
+    for (int i = SIZE / 2; i < SIZE; ++i) {
+        EXPECT_TRUE(table.consist(keys[i]));
+        EXPECT_EQ(table.find(keys[i]), "v" + std::to_string(keys[i]));
+    }
+}
+
+//ТЕСТ ИСКЛЮЧЕНИЙ И REPLACE
+TEST_F(TableAVLAdvancedTest, ReplaceAndExceptionsLogic) {
+    table.insert(10, "Initial");
+    table.replace(10, "Updated");
+    EXPECT_EQ(table.find(10), "Updated");
+
+    EXPECT_THROW(table.replace(20, "New"), std::invalid_argument);
+    EXPECT_THROW(table.find(999), std::invalid_argument);
+
+    EXPECT_NO_THROW(table.erase(999)); 
+}
+
+// ПЕЧАТЬ
+TEST_F(TableAVLAdvancedTest, SortingIntegrityInPrint) {
+    std::vector<int> input = { 50, 40, 30, 20, 10 };
+    for (int x : input) table.insert(x, ".");
+
+    std::ostringstream os;
+    table.print(os);
+    std::string s = os.str();
+
+    size_t p10 = s.find("10");
+    size_t p20 = s.find("20");
+    size_t p30 = s.find("30");
+    size_t p40 = s.find("40");
+    size_t p50 = s.find("50");
+
+    EXPECT_TRUE(p10 != std::string::npos); 
+    EXPECT_TRUE(p10 < p20 && p20 < p30 && p30 < p40 && p40 < p50);
+}
