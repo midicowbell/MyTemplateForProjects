@@ -13,7 +13,7 @@ struct HashDate {
     States _state = EMPTY;
     std::string _key = "";
     Tvalue _data = {};
-};
+}; 
 
 template<typename Tvalue>
 class HashTableOA : public Itable<std::string, Tvalue> {

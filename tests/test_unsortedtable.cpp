@@ -6,6 +6,8 @@
 #include "../libUnsortedTableOnList/unsortedTableOnList.h"
 #include "../libSortedTableOnBST/tabesOnBST.h"
 #include "../libSortedTableOnAVL/tableAVL.h"
+#include "../libHashTable/hashTable2.h"
+#include "../libHashTable/hashTable3.h"
 #include <string>
 #include <ostream>
 #include <algorithm>
@@ -521,3 +523,137 @@ TEST_F(TableAVLAdvancedTest, SortingIntegrityInPrint) {
     EXPECT_TRUE(p10 != std::string::npos); 
     EXPECT_TRUE(p10 < p20 && p20 < p30 && p30 < p40 && p40 < p50);
 }
+
+
+
+// Тест на переполнение (Overflow)
+TEST(DoubleHashingHardcore, OverflowProtection) {
+    HashTableDoubleHashing<int> table(3);
+
+    table.insert("A", 1);
+    table.insert("B", 2);
+    table.insert("C", 3);
+
+    EXPECT_THROW(table.insert("D", 4), std::overflow_error);
+}
+
+// Тест на переиспользование ячеек DELETEDо
+TEST(DoubleHashingHardcore, DeletedCellReuse) {
+    HashTableDoubleHashing<int> table(5);
+
+    table.insert("key1", 100);
+    table.insert("key2", 200);
+
+    table.erase("key1");
+    EXPECT_FALSE(table.consist("key1"));
+
+    table.insert("key1", 999);
+    EXPECT_TRUE(table.consist("key1"));
+    EXPECT_EQ(table.find("key1"), 999);
+}
+
+// Тест на обрыв цепочки
+TEST(DoubleHashingHardcore, ChainNotBrokenByDelete) {
+    HashTableDoubleHashing<int> table(7);
+
+    table.insert("a", 1);
+    table.insert("b", 2);
+    table.insert("c", 3);
+    table.insert("d", 4);
+
+    table.erase("b");
+
+    EXPECT_TRUE(table.consist("a"));
+    EXPECT_TRUE(table.consist("c"));
+    EXPECT_TRUE(table.consist("d"));
+}
+
+//Тест на пустую таблицу
+TEST(DoubleHashingHardcore, EmptyTableOperations) {
+    HashTableDoubleHashing<int> table(11);
+
+    EXPECT_TRUE(table.is_empty());
+    EXPECT_FALSE(table.consist("ghost"));
+    EXPECT_THROW(table.find("ghost"), std::logic_error);
+    EXPECT_THROW(table.erase("ghost"), std::logic_error);
+    EXPECT_THROW(table.replace("ghost", 5), std::logic_error);
+}
+
+// тест на дубликаты
+TEST(DoubleHashingHardcore, DuplicatesLogic) {
+    HashTableDoubleHashing<int> table(11);
+    table.insert("clone", 1);
+
+    EXPECT_THROW(table.insert("clone", 2), std::logic_error);
+
+    table.replace("clone", 500);
+    EXPECT_EQ(table.find("clone"), 500);
+}
+
+
+
+//  Стресс-тест цепочки
+TEST(ChainingHardcore, MassiveCollisions) {
+    HashTableChaining<int> table(1);
+    for (int i = 0; i < 1000; ++i) {
+        table.insert("key" + std::to_string(i), i);
+    }
+
+    EXPECT_FALSE(table.is_empty());
+
+    EXPECT_EQ(table.find("key0"), 0);
+    EXPECT_EQ(table.find("key500"), 500);
+    EXPECT_EQ(table.find("key999"), 999);
+}
+
+//Тест на удаление из разных частей вектора
+TEST(ChainingHardcore, ErasePositions) {
+    HashTableChaining<int> table(1);
+
+    table.insert("head", 1);
+    table.insert("mid1", 2);
+    table.insert("mid2", 3);
+    table.insert("tail", 4);
+
+    table.erase("tail");
+    EXPECT_FALSE(table.consist("tail"));
+
+    table.erase("head");
+    EXPECT_FALSE(table.consist("head"));
+
+    table.erase("mid1");
+    EXPECT_FALSE(table.consist("mid1"));
+
+    EXPECT_TRUE(table.consist("mid2"));
+    EXPECT_EQ(table.find("mid2"), 3);
+}
+
+//  Отсутствие переполнения
+TEST(ChainingHardcore, NoOverflow) {
+    HashTableChaining<int> table(2); // Размер 2
+    EXPECT_NO_THROW({
+        for (int i = 0; i < 10; ++i) {
+            table.insert("val" + std::to_string(i), i);
+        }
+        });
+}
+
+// Тест на замену значения в цепочке
+TEST(ChainingHardcore, ReplaceInChain) {
+    HashTableChaining<int> table(5);
+
+    table.insert("target", 10);
+    EXPECT_EQ(table.find("target"), 10);
+
+    table.replace("target", 999);
+    EXPECT_EQ(table.find("target"), 999);
+}
+
+// Тест на удаление несуществующих ключей в непустой цепочке
+TEST(ChainingHardcore, EraseGhostInPopulatedChain) {
+    HashTableChaining<int> table(1);
+    table.insert("real", 1);
+    EXPECT_THROW(table.erase("ghost"), std::logic_error);
+    EXPECT_TRUE(table.consist("real"));
+}
+
