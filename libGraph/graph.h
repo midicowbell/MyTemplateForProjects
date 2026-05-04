@@ -17,9 +17,9 @@ template<typename T>
 class AdjListGraph {
 private:
 	int count_vertices;
+	std::vector<Vertex<T>> vertices; 
 	bool isOriented;
 	bool isWeighted;
-	std::vector<Vertex<T>> vertices; 
 public:
 	AdjListGraph(int n, bool oriented, bool weighted, std::vector<std::pair<T, T>> _data) {
 		count_vertices = n;
@@ -79,12 +79,27 @@ public:
 		int u_ind = (int)u;
 		int v_ind = (int)v;
 		if (u_ind >= count_vertices || v_ind >= count_vertices) return;
-		while ()
-		vertices[u_ind].neighbors.remove[v];
-		if (!isOriented) {
-			vertices[v_ind].neighbors.remove[u];
-		}
 
+		auto it = vertices[u_ind].neighbors.begin();
+		while (it != vertices[u_ind].neighbors.end()) {
+			if (it->to == v) {
+				it = vertices[u_ind].neighbors.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
+		if (!isOriented) {
+			auto it_rev = vertices[v_ind].neighbors.begin();
+			while (it_rev != vertices[v_ind].neighbors.end()) {
+				if (it_rev->to == u) {
+					it_rev = vertices[v_ind].neighbors.erase(it_rev);
+				}
+				else {
+					++it_rev;
+				}
+			}
+		}
 	}
 	void delete_vertex(T v_to_delete) {
 		int del_idx = (int)v_to_delete;
@@ -113,48 +128,50 @@ public:
 		}
 	}
 	void djikrstra(T start, T end) {
-		int start = int(start);
-		int end = int(end);
-		if (start >= count_vertices || end >= count_vertices) {
-			throw std::logic_error("Таких вериш не сущесвуют\n");
+		int start_idx = (int)start;
+		int end_idx = (int)end;
+
+		if (start_idx >= count_vertices || end_idx >= count_vertices || start_idx < 0 || end_idx < 0) {
+			std::cerr << "Ошибка: таких вершин не существует\n";
 			return;
 		}
 		const int INF = 1e9 + 7;
-		std::vector<int> ans(count_vertices, INF);
-		std::vector<int> pr(count_vertices, INF);
-		std::priority_queue<std::pair<int, int>, std::vector<pair<int, int>>, std::greater<pair<int, int>>> q;
-		q.push({ 0, start });
-		while (!q.empty()) {
-			std::pair<int, int> c = q.top();
-			q.pop();
-			int dst = c.first;
-			int v = c.second;
-			if (ans[v] < dst) {
-				continue;
-			}
-			auto it = vertices[v].neighbors.begin();
-			while (it != vertices[v].neighbors.end()) {
-				int u = (int)it->to;
-				int len_vu = it->weight;
-				int n_dst = dst + len_vu; // текущий пробег(сколько прошли + новая дорога)
-				if (n_dst < ans[u]) {
-					ans[i] = n_dst;
-					pr[u] = v;
-					q.push({n_dst, u})
+		std::vector<int> dist(count_vertices, INF);
+		std::vector<int> parent(count_vertices, -1);
+		std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<std::pair<int, int>>> pq;
+
+		dist[start_idx] = 0;
+		pq.push({ 0, start_idx });
+
+		while (!pq.empty()) {
+			int d = pq.top().first;
+			int v = pq.top().second;
+			pq.pop();
+			if (d > dist[v]) continue;
+			for (const auto& edge : vertices[v].neighbors) {
+				int u = (int)edge.to;
+				int weight = edge.weight;
+
+				if (dist[v] + weight < dist[u]) {
+					dist[u] = dist[v] + weight;
+					parent[u] = v;
+					pq.push({ dist[u], u });
 				}
-				++it;
 			}
 		}
-		if (ans[end] == INF) { return; }
+
+		if (dist[end_idx] == INF) {
+			std::cout << "Пути от " << start_idx << " до " << end_idx << " не существует.\n";
+			return;
+		}
+
 		std::vector<int> path;
-		int cur = end;
-		path.push_back(cur);
-		while (pr[cur] != -1) {
-			cur = pr[cur];
-			path.push_back(cur);
+		for (int v = end_idx; v != -1; v = parent[v]) {
+			path.push_back(v);
 		}
 		std::reverse(path.begin(), path.end());
-		std::cout << "Кратчайший пусть от " << start << "до " << end << " равен:" << ans[end] << "\n";
+		std::cout << "Кратчайшее расстояние от " << start_idx << " до " << end_idx << " равно: " << dist[end_idx] << "\n";
+		std::cout << "Путь: ";
 		for (size_t i = 0; i < path.size(); i++) {
 			std::cout << path[i];
 			if (i != path.size() - 1) std::cout << " -> ";

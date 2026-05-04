@@ -2,6 +2,8 @@
 #include "Tree.h"
 #include "../libBSTree/bstree.h"
 #include "../libAVLtree/avltree.h"
+#include "../libGraph/graph.h"
+#include "../libGraph/graph2.h"
 //БАЗОВЫЕ ОПЕРАЦИИ (ВСТАВКА И ПУСТОТА)
 TEST(TreeFullTest, BasicInsertAndEmpty) {
     Tree<int, std::string> tree;
@@ -281,4 +283,36 @@ TEST(AVLTreeTest, RemoveAndRebalance) {
     EXPECT_EQ(tree.find(30), nullptr);
     EXPECT_LE(tree.height(), 2);
     EXPECT_NE(tree.find(20), nullptr);
+}
+// ТЕСТЫ ДЛЯ МАТРИЦЫ
+TEST(MatrixGraphTest, BasicFunctionality) {
+    AdjMatirxGraph g(5, false, true);
+    EXPECT_NO_THROW(g.addEdge(0, 1, 10));
+    EXPECT_NO_THROW(g.addEdge(3, 4, 5));
+
+    EXPECT_NO_THROW(g.removeEdge(0, 1));
+
+    EXPECT_NO_THROW(g.removeVertex(3));
+}
+
+//ТЕСТЫ ДЛЯ СПИСКА
+TEST(ListGraphTest, DeleteEdgeManual) {
+    std::vector<std::pair<int, int>> empty_data;
+    AdjListGraph<int> g(3, false, false, empty_data);
+
+    g.add_edge(0, 1, 1);
+    g.add_edge(1, 2, 1);
+    EXPECT_NO_THROW(g.delete_edge(0, 1));
+}
+
+TEST(ListGraphTest, DijkstraExecution) {
+    std::vector<std::pair<int, int>> data = { {0, 1}, {1, 2} };
+    AdjListGraph<int> g(3, false, true, data);
+    EXPECT_NO_THROW(g.djikrstra(0, 2));
+}
+
+TEST(ListGraphTest, VertexDeletionIntegrity) {
+    std::vector<std::pair<int, int>> data = { {0, 1}, {1, 2}, {2, 0} };
+    AdjListGraph<int> g(3, true, false, data);
+    EXPECT_NO_THROW(g.delete_vertex(1));
 }
