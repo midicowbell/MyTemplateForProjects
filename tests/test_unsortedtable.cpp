@@ -23,7 +23,7 @@ protected:
     TableAVL<int, std::string> table;
 };
 
-// Тест 1: Вставка и поиск
+// Вставка и поиск
 TEST(UnsortedTableTest, InsertAndFind) {
     UnsortedTableOnVec<std::string, int> table;
 
@@ -35,7 +35,7 @@ TEST(UnsortedTableTest, InsertAndFind) {
     EXPECT_EQ(table.size(), 2);
 }
 
-// Тест 2: Проверка на наличие ключа
+// Проверка на наличие ключа
 TEST(UnsortedTableTest, Consist) {
     UnsortedTableOnVec<int, std::string> table;
 
@@ -45,7 +45,7 @@ TEST(UnsortedTableTest, Consist) {
     EXPECT_FALSE(table.consist(2));
 }
 
-// Тест 3: Замена существующего значения
+// Замена существующего значения
 TEST(UnsortedTableTest, ReplaceExisting) {
     UnsortedTableOnVec<std::string, int> table;
 
@@ -55,7 +55,7 @@ TEST(UnsortedTableTest, ReplaceExisting) {
     EXPECT_EQ(table.find("power"), 9001);
 }
 
-// Тест 4: Удаление элемента
+//удаление элемента
 TEST(UnsortedTableTest, EraseElement) {
     UnsortedTableOnVec<int, int> table;
 
@@ -68,7 +68,7 @@ TEST(UnsortedTableTest, EraseElement) {
     EXPECT_EQ(table.size(), 1);
 }
 
-// Тест 5: Исключение при поиске несуществующего ключа
+//  Исключение при поиске несуществующего ключа
 TEST(UnsortedTableTest, FindNonExistentThrows) {
     UnsortedTableOnVec<int, int> table;
 
@@ -77,7 +77,7 @@ TEST(UnsortedTableTest, FindNonExistentThrows) {
     EXPECT_THROW(table.find(99), std::out_of_range);
 }
 
-// Тест 6: Запрет на вставку дубликатов ключей
+//  Запрет на вставку дубликатов ключей
 TEST(UnsortedTableTest, InsertDuplicateThrows) {
     UnsortedTableOnVec<std::string, int> table;
 
@@ -144,7 +144,7 @@ TEST(SortedTableOnVecTest, EraseNonExistingDoesNothing) {
     SortedTableOnVec<int, std::string> t;
     t.insert(1, "one");
 
-    t.erase(999); // не должно упасть
+    t.erase(999);
 
     EXPECT_EQ(t.size(), 1);
     EXPECT_TRUE(t.consist(1));
@@ -177,7 +177,7 @@ TEST(SortedTableOnVecTest, BinarySearchCorrectPositions) {
     EXPECT_EQ(t.binary_search(35), 3);
 }
 
-// Тест: вставка и поиск
+// вставка и поиск
 TEST(UnsortedTableOnListTest, InsertAndFind) {
     UnsortedTableOnList<int, std::string> t;
 
@@ -190,7 +190,7 @@ TEST(UnsortedTableOnListTest, InsertAndFind) {
     EXPECT_EQ(t.find(20), "twenty");
 }
 
-// Тест: вставка дубликата
+//  вставка дубликата
 TEST(UnsortedTableOnListTest, InsertDuplicateThrows) {
     UnsortedTableOnList<int, std::string> t;
 
@@ -198,7 +198,7 @@ TEST(UnsortedTableOnListTest, InsertDuplicateThrows) {
     EXPECT_THROW(t.insert(1, "duplicate"), std::logic_error);
 }
 
-// Тест: consist
+// consist
 TEST(UnsortedTableOnListTest, ConsistWorks) {
     UnsortedTableOnList<int, std::string> t;
 
@@ -208,7 +208,7 @@ TEST(UnsortedTableOnListTest, ConsistWorks) {
     EXPECT_FALSE(t.consist(4));
 }
 
-// Тест: replace существующего ключа
+// replace существующего ключа
 TEST(UnsortedTableOnListTest, ReplaceExisting) {
     UnsortedTableOnList<int, std::string> t;
 
@@ -218,7 +218,7 @@ TEST(UnsortedTableOnListTest, ReplaceExisting) {
     EXPECT_EQ(t.find(7), "SEVEN");
 }
 
-// Тест: replace несуществующего ключа → вставка
+// replace несуществующего ключа → вставка
 TEST(UnsortedTableOnListTest, ReplaceNonExistingInserts) {
     UnsortedTableOnList<int, std::string> t;
 
@@ -228,7 +228,7 @@ TEST(UnsortedTableOnListTest, ReplaceNonExistingInserts) {
     EXPECT_EQ(t.find(100), "hundred");
 }
 
-// Тест: find бросает исключение
+// find бросает исключение
 TEST(UnsortedTableOnListTest, FindThrowsIfNotFound) {
     UnsortedTableOnList<int, std::string> t;
 
@@ -237,7 +237,7 @@ TEST(UnsortedTableOnListTest, FindThrowsIfNotFound) {
     EXPECT_THROW(t.find(2), std::logic_error);
 }
 
-// Тест: erase существующего ключа
+//  erase существующего ключа
 TEST(UnsortedTableOnListTest, EraseExisting) {
     UnsortedTableOnList<int, std::string> t;
 
@@ -250,18 +250,18 @@ TEST(UnsortedTableOnListTest, EraseExisting) {
     EXPECT_TRUE(t.consist(2));
 }
 
-// Тест: erase несуществующего ключа (не должно падать)
+//  erase несуществующего ключа
 TEST(UnsortedTableOnListTest, EraseNonExistingDoesNothing) {
     UnsortedTableOnList<int, std::string> t;
 
     t.insert(1, "one");
 
-    t.erase(999); // не должно упасть
+    t.erase(999); 
 
     EXPECT_TRUE(t.consist(1));
 }
 
-// Тест: is_empty
+//  is_empty
 TEST(UnsortedTableOnListTest, IsEmptyWorks) {
     UnsortedTableOnList<int, std::string> t;
 
@@ -272,7 +272,7 @@ TEST(UnsortedTableOnListTest, IsEmptyWorks) {
     EXPECT_FALSE(t.is_empty());
 }
 
-// Тест: print (просто проверяем, что не падает)
+// print (просто проверяем, что не падает)
 TEST(UnsortedTableOnListTest, PrintDoesNotCrash) {
     UnsortedTableOnList<int, std::string> t;
 
@@ -293,7 +293,7 @@ TEST_F(TreeTableAdvancedTest, FindReturnsModifiableReference) {
     EXPECT_EQ(table.find(1), "ChangedViaReference");
 }
 
-// --- 2. ТЕСТ ВЫРОЖДЕННОГО ДЕРЕВА ("СОСИСКА") ---
+// ТЕСТ ВЫРОЖДЕННОГО ДЕРЕВА
 TEST_F(TreeTableAdvancedTest, LongChainSequentialInsert) {
     for (int i = 0; i < 100; ++i) {
         table.insert(i, "val_" + std::to_string(i));
@@ -304,7 +304,7 @@ TEST_F(TreeTableAdvancedTest, LongChainSequentialInsert) {
     EXPECT_TRUE(table.consist(50));
 }
 
-// --- 3. ТЕСТ СЛОЖНОГО УДАЛЕНИЯ (Узел с двумя детьми) ---
+//ТЕСТ СЛОЖНОГО УДАЛЕНИЯ
 TEST_F(TreeTableAdvancedTest, RemoveNodeWithTwoChildren) {
     /* Структура:
           50
@@ -329,7 +329,7 @@ TEST_F(TreeTableAdvancedTest, RemoveNodeWithTwoChildren) {
     EXPECT_EQ(table.find(70), "R"); 
 }
 
-// --- 4. ТЕСТ НА СТРЕСС И РАНДОМ ---
+// ТЕСТ НА СТРЕСС И РАНДОМ
 TEST_F(TreeTableAdvancedTest, StressRandomInsertErase) {
     std::vector<int> keys;
     for (int i = 0; i < 200; ++i) keys.push_back(i);
@@ -526,7 +526,7 @@ TEST_F(TableAVLAdvancedTest, SortingIntegrityInPrint) {
 
 
 
-// Тест на переполнение (Overflow)
+// Тест на переполнение
 TEST(DoubleHashingHardcore, OverflowProtection) {
     HashTableDoubleHashing<int> table(3);
 
@@ -630,7 +630,7 @@ TEST(ChainingHardcore, ErasePositions) {
 
 //  Отсутствие переполнения
 TEST(ChainingHardcore, NoOverflow) {
-    HashTableChaining<int> table(2); // Размер 2
+    HashTableChaining<int> table(2);
     EXPECT_NO_THROW({
         for (int i = 0; i < 10; ++i) {
             table.insert("val" + std::to_string(i), i);

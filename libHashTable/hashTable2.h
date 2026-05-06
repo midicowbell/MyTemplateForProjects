@@ -21,13 +21,13 @@ private:
     size_t _size;
     size_t _count = 0;
 
-    size_t h1(const std::string& key) const {
+    size_t h1(const std::string& key) const {    // начальная позиция
         size_t hash = 0;
         for (char c : key) hash = hash * 31 + static_cast<unsigned char>(c);
         return hash % _size;
     }
 
-    size_t h2(const std::string& key) const {
+    size_t h2(const std::string& key) const {  // шаг, с которым прыгаем по таблице, если занято
         size_t hash = 0;
         for (char c : key) hash = hash * 17 + static_cast<unsigned char>(c);
         return 1 + (hash % (_size - 1));
