@@ -19,6 +19,7 @@ add_subdirectory(libTree)
 add_subdirectory(libBSTree)
 add_subdirectory(libAVLtree)
 add_subdirectory(libGraph)
+add_subdirectory(libRBTree)
 
 
 # основной исполняемый файл

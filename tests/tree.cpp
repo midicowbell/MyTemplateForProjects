@@ -4,6 +4,11 @@
 #include "../libAVLtree/avltree.h"
 #include "../libGraph/graph.h"
 #include "../libGraph/graph2.h"
+#include "../libRBTree/rbtree.h"
+class RBTreeTest : public ::testing::Test {
+protected:
+    RBTree<int, std::string> tree;
+};
 //БАЗОВЫЕ ОПЕРАЦИИ (ВСТАВКА И ПУСТОТА)
 TEST(TreeFullTest, BasicInsertAndEmpty) {
     Tree<int, std::string> tree;
@@ -315,4 +320,105 @@ TEST(ListGraphTest, VertexDeletionIntegrity) {
     std::vector<std::pair<int, int>> data = { {0, 1}, {1, 2}, {2, 0} };
     AdjListGraph<int> g(3, true, false, data);
     EXPECT_NO_THROW(g.delete_vertex(1));
+}
+
+// проверка базовой вставки и правила корня
+TEST_F(RBTreeTest, RootIsAlwaysBlack) {
+    tree.insert(10, "root");
+}
+
+// Проверка case 1 
+TEST_F(RBTreeTest, Case1Recolor) {
+    /*
+           20(B)
+          /    \
+       10(R)  30(R)
+     */
+    tree.insert(20, "G");                      
+    tree.insert(10, "P");                       
+    tree.insert(30, "U"); // дядя красный
+
+    // вставка 5 сделает P и U черными, а G красным (и потом G станет черным, так как он корень)
+    /*
+    * 
+                * 20(B)
+                 /    \
+              10(B)  30(B)
+               /
+             5(R)
+    * 
+    * 
+    * 
+    */
+    EXPECT_NO_THROW(tree.insert(5, "Z"));
+}
+
+// проверка case 2 и case 3 (Малый и большой повороты)
+TEST_F(RBTreeTest, Case2And3Rotations) {
+    // создаем линию для case 3
+    /*
+             30(B)
+           /
+         20(R)
+    */
+    tree.insert(30, "G");
+    tree.insert(20, "P");
+    /*
+              30(B)
+              /    
+             20(R)
+            /
+            10(R)
+    */
+
+
+    tree.insert(10, "X"); // правый поворот вокруг 30
+
+    /*
+            20(B)
+             /    \
+          10(R)  30(R)
+    */
+
+
+
+
+
+
+    // создаем "зигзаг" для case 2
+    tree.insert(50, "G2");
+    tree.insert(40, "P2");
+    tree.insert(45, "X2"); // левый поворот вокруг 40 (малый), затем правый вокруг 50 (большой)
+    /*
+    
+    
+    50(B)                   50(B)                45(B)
+     /                      /                   /     \
+  40(R)        ->          45(R)       ->      40(R)    50(R)
+                           /         
+    \                     40(R)  
+    45(R)                   
+    */
+    EXPECT_NO_THROW();
+}
+
+// Массовая вставка и проверка стабильности
+TEST_F(RBTreeTest, SequentialInsertion) {
+    for (int i = 1; i <= 100; ++i) {
+        EXPECT_NO_THROW(tree.insert(i, "val" + std::to_string(i)));
+    }
+}
+
+TEST(RBTreeVisualTest, PrintWithLines) {
+    RBTree<int, int> tree;
+
+    for (int v : {10, 20, 30, 5, 15, 25, 35}) {
+        tree.insert(v, v);
+    }
+
+    std::cout << "\n[ КРАСНО-ЧЕРНОЕ ДЕРЕВО ]\n" << std::endl;
+    tree.print();
+    std::cout << "\n[ --------------------- ]" << std::endl;
+
+    SUCCEED();
 }

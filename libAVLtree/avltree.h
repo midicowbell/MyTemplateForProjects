@@ -19,6 +19,14 @@ private:
             delete node;
         }
     }
+    /* (правая ветка слишком большая)
+      G (бывший корень)               P (новый корень)
+     / \                             / \
+    T1  P          ------>          G   T3
+       / \                         / \
+      T2  T3                      T1  T2
+
+*/
     void left_rotate(AVLNode<Tkey, Tvalue>* G) {
         AVLNode<Tkey, Tvalue>* P = G->_right;
         G->_right = P->_left;
@@ -40,6 +48,15 @@ private:
         recalc_height(G);
         recalc_height(P);
     }
+    /* (левая ветка слишком большая)
+        G (бывший корень)             P (новый корень)
+       / \                           / \
+      P   T3       ------>          T1  G
+     / \                               / \
+    T1  T2                            T2  T3
+
+
+*/
     void right_rotate(AVLNode<Tkey, Tvalue>* G) {
         AVLNode<Tkey, Tvalue>* P = G->_left;
         G->_left = P->_right;
@@ -87,14 +104,52 @@ private:
         if (bal == 2) {
             if (get_balance(node->_right) < 0) {
                 right_rotate(node->_right); // сучай RL
+                                            /*
+                                  БЫЛО (RL):            ВЫПРЯМЛЯЕМ (RR):        СТАЛО:
+                                  A (bal: 2)               A                      C
+                                   \                        \                    / \
+                                    B                        C                  A   B
+                                   /                          \
+                                  C                            B
+                                                  
+                                            */
+
             }
-            left_rotate(node); // случай RR
+            left_rotate(node); // случай RR (слишком тяжелое правое поддерево)
+                                        /*
+                                  БЫЛО (RR):              СТАЛО:
+                                  A (bal: 2)                B
+                                   \                       / \
+                                    B                     A   C
+                                     \
+                                      C
+                                
+                            */
         }
         else if (bal == -2) {
             if (get_balance(node->_left) > 0) {
                 left_rotate(node->_left); // случай LR
+                                            /*
+                                  БЫЛО (LR):            ВЫПРЯМЛЯЕМ (LL):        СТАЛО:
+                                    A (bal: -2)            A                      C
+                                   /                      /                      / \
+                                  B                      C                      B   A
+                                   \                    /
+                                    C                  B
+                                        
+                            */
+
             }
-            right_rotate(node); // случай LL
+            right_rotate(node); // случай LL (слишком тяжелое левое поддерево) 
+                                    /*
+                              БЫЛО (LL):              СТАЛО:
+                                  A (bal: -2)          B
+                                 /                    / \
+                                B                    C   A
+                               /
+                              C
+                            
+                                */
         }
     }
     int get_height(AVLNode<Tkey, Tvalue>* node) const {
