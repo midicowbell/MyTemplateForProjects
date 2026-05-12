@@ -224,7 +224,13 @@ TEST(AVLTreeTest, RotationRR) {
     tree.insert(10, 10);
     tree.insert(20, 20);
     tree.insert(30, 30);
-
+    /*       (левое вращение)
+            10                   20                 
+              \                 /   \
+                20      ->    10     30
+                  \
+                   30
+    */
     EXPECT_EQ(tree.height(), 2);
 }
 
@@ -234,7 +240,13 @@ TEST(AVLTreeTest, RotationLL) {
     tree.insert(30, 30);
     tree.insert(20, 20);
     tree.insert(10, 10);
-
+    /*     (правое вращение)
+               30              20
+              /               /  \
+             20      ->      10   30
+            /
+           10
+    */
     EXPECT_EQ(tree.height(), 2);
 }
 
@@ -244,7 +256,13 @@ TEST(AVLTreeTest, RotationLR) {
     tree.insert(30, 30);
     tree.insert(10, 10);
     tree.insert(20, 20);
-
+    /*        
+              30                    30             20
+             /                     /              /  \  
+            10              ->    20      ->    10    30
+              \                  /
+                20              10
+    */
     EXPECT_EQ(tree.height(), 2);
     EXPECT_NE(tree.find(20), nullptr);
 }
@@ -255,7 +273,13 @@ TEST(AVLTreeTest, RotationRL) {
     tree.insert(10, 10);
     tree.insert(30, 30);
     tree.insert(20, 20);
-
+    /*
+        10              10                30
+          \               \              /  \
+            30 ->          20     ->    10   20
+           /                 \
+         20                   30
+    */
     EXPECT_EQ(tree.height(), 2);
 }
 

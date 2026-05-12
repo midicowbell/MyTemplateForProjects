@@ -225,35 +225,36 @@ public:
     }
     int height() const { return get_height(_root); }
     void remove(const Tkey& key) {
+        // ищем ноду, которую надо удалить
         AVLNode<Tkey, Tvalue>* pNode = _root;
         while (pNode != nullptr && pNode->_data.first != key) {
             if (key < pNode->_data.first) pNode = pNode->_left;
             else pNode = pNode->_right;
         }
 
-        if (pNode == nullptr) return;
-
+        if (pNode == nullptr) return; //   
+        // выбираем, что удалять в зависимоти от количества детей
         AVLNode<Tkey, Tvalue>* pDelete = nullptr;
         if (pNode->_left == nullptr || pNode->_right == nullptr) {
-            pDelete = pNode; 
+            pDelete = pNode; // 0 or 1
         }
-        else {
+        else { // 2 (ищем замену в правой ветке)
             pDelete = pNode->_right;
             while (pDelete->_left != nullptr) pDelete = pDelete->_left;
 
             pNode->_data = pDelete->_data;
         }
         AVLNode<Tkey, Tvalue>* pChild = (pDelete->_left != nullptr) ? pDelete->_left : pDelete->_right;
-        AVLNode<Tkey, Tvalue>* pBalanceStart = pDelete->_parent;
+        AVLNode<Tkey, Tvalue>* pBalanceStart = pDelete->_parent; //запомнили, где надо баллансировать
 
         if (pChild != nullptr) {
-            pChild->_parent = pDelete->_parent;
+            pChild->_parent = pDelete->_parent; //child наверх к деду
         }
 
         if (pDelete->_parent == nullptr) {
-            _root = pChild;
+            _root = pChild; 
         }
-        else {
+        else {//отцепляем узел удаляемый от родителя
             if (pDelete->_parent->_left == pDelete) {
                 pDelete->_parent->_left = pChild;
             }
@@ -261,7 +262,7 @@ public:
                 pDelete->_parent->_right = pChild;
             }
         }
-
+        // удаляем и баллансируем
         delete pDelete;
         AVLNode<Tkey, Tvalue>* pTemp = pBalanceStart;
         while (pTemp != nullptr) {
