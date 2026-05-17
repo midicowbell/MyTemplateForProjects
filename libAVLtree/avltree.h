@@ -232,7 +232,7 @@ public:
             else pNode = pNode->_right;
         }
 
-        if (pNode == nullptr) return; //   
+        if (pNode == nullptr) return; 
         // выбираем, что удалять в зависимоти от количества детей
         AVLNode<Tkey, Tvalue>* pDelete = nullptr;
         if (pNode->_left == nullptr || pNode->_right == nullptr) {

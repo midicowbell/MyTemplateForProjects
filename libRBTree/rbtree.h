@@ -20,6 +20,13 @@ struct RBTreeNode {
 template<typename Tkey, typename Tvalue>
 class RBTree {
 private:
+    void clear(RBTreeNode<Tkey, Tvalue>* node) {
+        if (node != nullptr) {
+            clear(node->left);
+            clear(node->right);
+            delete node;
+        }
+    }
     RBTreeNode<Tkey, Tvalue>* root;
     int get_bh(RBTreeNode<Tkey, Tvalue>* node) {
         if (node == nullptr) {
@@ -180,7 +187,7 @@ private:
     void printRecursive(RBTreeNode<Tkey, Tvalue>* node, std::string prefix, bool isLeft, bool isRoot) {
         if (node == nullptr) return;
 
-        // сначала ПРАВОЕ поддерево
+        // сначала правое поддерево
         if (node->right != nullptr) {
             std::string nextPrefix = prefix;
             if (!isRoot) {
@@ -205,7 +212,7 @@ private:
             std::cout << "(BLACK)" << std::endl;
         }
 
-        //затем ЛЕВОЕ поддерево
+        //затем левое поддерево
         if (node->left != nullptr) {
             std::string nextPrefix = prefix;
             if (!isRoot) {
@@ -218,7 +225,9 @@ private:
 
 public:
     RBTree() : root(nullptr) {}
-
+    ~RBTree() {
+        clear(root);
+    }
     void insert(Tkey key, Tvalue value) {
         RBTreeNode<Tkey, Tvalue>* z = new RBTreeNode<Tkey, Tvalue>(key, value);
         RBTreeNode<Tkey, Tvalue>* y = nullptr;
@@ -226,7 +235,11 @@ public:
 
         while (x != nullptr) {
             y = x;
-            if (z->data.first < x->data.first) x = x->left;
+            if (key == x->data.first) {
+                delete z; 
+                return;   
+            }
+            if (key < x->data.first) x = x->left;
             else x = x->right;
         }
 
