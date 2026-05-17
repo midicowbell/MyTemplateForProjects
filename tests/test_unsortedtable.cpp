@@ -656,4 +656,120 @@ TEST(ChainingHardcore, EraseGhostInPopulatedChain) {
     EXPECT_THROW(table.erase("ghost"), std::logic_error);
     EXPECT_TRUE(table.consist("real"));
 }
+// Проверка автоматической сортировки при вставке в случайном порядке
+TEST(SortedTableOnVecTest, OrderMaintainedOnRandomInsert) {
+    SortedTableOnVec<int, std::string> t;
 
+    // Вставляем элементы вразнобой
+    t.insert(50, "fifty");
+    t.insert(10, "ten");
+    t.insert(40, "forty");
+    t.insert(20, "twenty");
+    t.insert(30, "thirty");
+
+    std::ostringstream os;
+    t.print(os);
+    std::string s = os.str();
+
+    size_t p10 = s.find("10");
+    size_t p20 = s.find("20");
+    size_t p30 = s.find("30");
+    size_t p40 = s.find("40");
+    size_t p50 = s.find("50");
+
+    // Проверяем, что в выводе ключи идут строго по возрастанию
+    EXPECT_TRUE(p10 < p20 && p20 < p30 && p30 < p40 && p40 < p50);
+}
+
+// Проверка сохранения порядка после удаления элементов из разных частей вектора
+TEST(SortedTableOnVecTest, OrderMaintainedAfterErase) {
+    SortedTableOnVec<int, std::string> t;
+
+    t.insert(30, "30");
+    t.insert(10, "10");
+    t.insert(40, "40");
+    t.insert(20, "20");
+
+    // Удаляем элемент из середины (20) и конца (40)
+    t.erase(20);
+    t.erase(40);
+
+    std::ostringstream os;
+    t.print(os);
+    std::string s = os.str();
+
+    size_t p10 = s.find("10");
+    size_t p30 = s.find("30");
+
+    EXPECT_TRUE(p10 < p30);
+    EXPECT_EQ(s.find("20"), std::string::npos);
+    EXPECT_EQ(s.find("40"), std::string::npos);
+}
+// Проверка упорядоченности BST после удаления корня и сложных узлов
+TEST_F(TreeTableAdvancedTest, OrderIntegrityAfterComplexErase) {
+    // Строим дерево
+    table.insert(100, "root");
+    table.insert(50, "L");
+    table.insert(150, "R");
+    table.insert(25, "LL");
+    table.insert(75, "LR");
+    table.insert(125, "RL");
+    table.insert(175, "RR");
+
+    // Удаляем корень (100) — у него два потомка
+    table.erase(100);
+    // Удаляем узел с одним или двумя потомками (50)
+    table.erase(50);
+
+    std::ostringstream os;
+    table.print(os);
+    std::string s = os.str();
+
+    // Оставшиеся ключи: 25, 75, 125, 150, 175
+    size_t p25 = s.find("25");
+    size_t p75 = s.find("75");
+    size_t p125 = s.find("125");
+    size_t p150 = s.find("150");
+    size_t p175 = s.find("175");
+
+    // Инвариант упорядоченного обхода (In-order traversal) должен сохраняться
+    EXPECT_TRUE(p25 < p75 && p75 < p125 && p125 < p150 && p150 < p175);
+}
+// Проверка, что балансировка (вращения) в AVL не нарушает порядок ключей
+TEST_F(TableAVLAdvancedTest, SortingIntegrityAfterMassiveRotations) {
+    std::vector<int> random_keys = { 15, 10, 20, 5, 12, 18, 25, 3, 8, 11, 14, 16, 19, 22, 27 };
+
+    for (int k : random_keys) {
+        table.insert(k, ".");
+    }
+
+    // Проверяем исходный порядок
+    std::ostringstream os1;
+    table.print(os1);
+    std::string s1 = os1.str();
+
+    // Проверяем последовательность позиций выборочно
+    EXPECT_TRUE(s1.find("3") < s1.find("5"));
+    EXPECT_TRUE(s1.find("12") < s1.find("14"));
+    EXPECT_TRUE(s1.find("22") < s1.find("25"));
+
+    // Теперь провоцируем серию вращений через удаление узлов
+    table.erase(5);
+    table.erase(20);
+    table.erase(15); // Удаление корня
+
+    std::ostringstream os2;
+    table.print(os2);
+    std::string s2 = os2.str();
+
+    // Проверяем, что оставшиеся элементы всё еще идеально отсортированы
+    // Оставшиеся для теста: 3, 8, 10, 11, 12, 14
+    size_t p3 = s2.find("3");
+    size_t p8 = s2.find("8");
+    size_t p10 = s2.find("10");
+    size_t p11 = s2.find("11");
+    size_t p12 = s2.find("12");
+    size_t p14 = s2.find("14");
+
+    EXPECT_TRUE(p3 < p8 && p8 < p10 && p10 < p11 && p11 < p12 && p12 < p14);
+}

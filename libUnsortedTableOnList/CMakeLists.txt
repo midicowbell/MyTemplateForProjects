@@ -1,4 +1,4 @@
-add_library(UnsortedTableOnList UnsortedTableOnList.cpp)
+add_library(UnsortedTableOnList unsortedTableOnList.cpp)
 
 
 target_link_libraries(UnsortedTableOnList PUBLIC itable)
