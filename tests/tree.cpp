@@ -314,24 +314,59 @@ TEST(AVLTreeTest, RemoveAndRebalance) {
     EXPECT_NE(tree.find(20), nullptr);
 }
 // ТЕСТЫ ДЛЯ МАТРИЦЫ
-TEST(MatrixGraphTest, BasicFunctionality) {
-    AdjMatirxGraph g(5, false, true);
+TEST(MatrixGraphTest, AddAndRemoveEdges) {
+    AdjMatirxGraph g(4, false, true); 
     EXPECT_NO_THROW(g.addEdge(0, 1, 10));
-    EXPECT_NO_THROW(g.addEdge(3, 4, 5));
+    EXPECT_NO_THROW(g.addEdge(1, 2, 20));
+    EXPECT_NO_THROW(g.addEdge(2, 3, 30));
 
     EXPECT_NO_THROW(g.removeEdge(0, 1));
+    EXPECT_NO_THROW(g.removeEdge(0, 3)); 
+}
+TEST(MatrixGraphTest, AddEdgesAndRemoveVertex) {
+    AdjMatirxGraph g(3, false, false); 
+    EXPECT_NO_THROW(g.addEdge(1, 0, 1));
+    EXPECT_NO_THROW(g.addEdge(1, 2, 1));
+    EXPECT_NO_THROW(g.removeVertex(1));
+    EXPECT_NO_THROW(g.removeVertex(1));
+}
+TEST(MatrixGraphTest, InvalidIndicesProtection) {
+    AdjMatirxGraph g(3, false, false); 
 
-    EXPECT_NO_THROW(g.removeVertex(3));
+    EXPECT_NO_THROW(g.addEdge(0, 5, 10));  
+    EXPECT_NO_THROW(g.removeEdge(1, -1)); 
+    EXPECT_NO_THROW(g.removeVertex(10));   
 }
 
 //ТЕСТЫ ДЛЯ СПИСКА
-TEST(ListGraphTest, DeleteEdgeManual) {
-    std::vector<std::pair<int, int>> empty_data;
-    AdjListGraph<int> g(3, false, false, empty_data);
+TEST(ListGraphTest, ConstructorInsertAndEdgeDelete) {
+    std::vector<std::pair<int, int>> initial_edges = { {0, 1}, {1, 2} };
+    AdjListGraph<int> g(4, false, false, initial_edges);
+    EXPECT_NO_THROW(g.add_edge(2, 3, 1));
+    EXPECT_NO_THROW(g.delete_edge(0, 1));
+    EXPECT_NO_THROW(g.delete_edge(2, 3));
+}
 
+TEST(ListGraphTest, AddEdgesAndPhysicalVertexDelete) {
+    std::vector<std::pair<int, int>> empty_data;
+    AdjListGraph<int> g(5, false, false, empty_data);
     g.add_edge(0, 1, 1);
     g.add_edge(1, 2, 1);
-    EXPECT_NO_THROW(g.delete_edge(0, 1));
+    g.add_edge(2, 3, 1);
+    g.add_edge(3, 4, 1);
+    EXPECT_NO_THROW(g.delete_vertex(2));
+    EXPECT_NO_THROW(g.delete_vertex(10));
+}
+TEST(ListGraphTest, InsertAndRunDijkstra) {
+    std::vector<std::pair<int, int>> empty_data;
+    AdjListGraph<int> g(4, false, true, empty_data);
+    g.add_edge(0, 1, 5);
+    g.add_edge(1, 2, 3);
+    g.add_edge(0, 2, 10); 
+    g.add_edge(2, 3, 2);
+
+    EXPECT_NO_THROW(g.djikrstra(0, 3));
+    EXPECT_NO_THROW(g.djikrstra(0, 99));
 }
 
 TEST(ListGraphTest, DijkstraExecution) {

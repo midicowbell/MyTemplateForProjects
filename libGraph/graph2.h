@@ -16,17 +16,21 @@ public:
 		_matrix.resize(n, std::vector<int>(n, 0));
 	}
 	void addEdge(int u, int v, int weight) {
-		int value;
+		if (u < 0 || u >= _vertices || v < 0 || v >= _vertices) return;
 
-		if (_isWeighted) {
-			value = weight;
-		}
-		else {
-			value = 1;
-		}
+		int value = _isWeighted ? weight : 1;
 		_matrix[u][v] = value;
 		if (!_isOriented) {
 			_matrix[v][u] = value;
+		}
+	}
+
+	void removeEdge(int u, int v) {
+		if (u < 0 || u >= _vertices || v < 0 || v >= _vertices) return;
+
+		_matrix[u][v] = 0;
+		if (!_isOriented) {
+			_matrix[v][u] = 0;
 		}
 	}
 	void removeVertex(int v) {
@@ -35,12 +39,6 @@ public:
 		for (int i = 0; i < _vertices; i++) {
 			_matrix[v][i] = 0;
 			_matrix[i][v] = 0; 
-		}
-	}
-	void removeEdge(int u, int v) {
-		_matrix[u][v] = 0;
-		if (_isOriented == false) {
-			_matrix[v][u] = 0;
 		}
 	}
 	void print() {

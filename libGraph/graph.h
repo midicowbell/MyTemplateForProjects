@@ -103,18 +103,20 @@ public:
 	}
 	void delete_vertex(T v_to_delete) {
 		int del_idx = (int)v_to_delete;
-		if (del_idx >= count_vertices) return;
 
-		vertices.erase(vertices.begin() + del_idx);
-		count_vertices--;
-		for (int i = 0; i < count_vertices; i++) {
+		// используем актуальный размер, а не count_vertices
+		if (del_idx < 0 || del_idx >= (int)vertices.size()) return;
 
+		for (int i = 0; i < (int)vertices.size(); i++) {
+			if (i == del_idx) continue; // соседей удаляемой вершины не трогаем
+
+			// сдвигаем data, если индекс вершины больше удаляемого
 			if ((int)vertices[i].data > del_idx) {
 				vertices[i].data = (T)((int)vertices[i].data - 1);
 			}
+
 			auto it = vertices[i].neighbors.begin();
 			while (it != vertices[i].neighbors.end()) {
-
 				if ((int)it->to == del_idx) {
 					it = vertices[i].neighbors.erase(it);
 				}
@@ -126,6 +128,8 @@ public:
 				}
 			}
 		}
+		vertices.erase(vertices.begin() + del_idx);
+		count_vertices = (int)vertices.size();
 	}
 	void djikrstra(T start, T end) {
 		int start_idx = (int)start;
