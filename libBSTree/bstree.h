@@ -26,7 +26,6 @@ private:
         }
         return pNode;
     }
-private:
     BSTNode<Tkey, Tvalue>* remove_rec(BSTNode<Tkey, Tvalue>* node, const Tkey& key) {
         if (node == nullptr) return nullptr;
 

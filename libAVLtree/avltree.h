@@ -132,7 +132,7 @@ private:
                                             /*
                                   БЫЛО (LR):            ВЫПРЯМЛЯЕМ (LL):        СТАЛО:
                                     A (bal: -2)            A                      C
-                                   /                      /                      / \
+                                   /                      /                      / \ 
                                   B                      C                      B   A
                                    \                    /
                                     C                  B
@@ -199,7 +199,7 @@ public:
         else {
             pParent->_right = pNew;
         }
-
+        //идем к корню и балансируем
         AVLNode<Tkey, Tvalue>* pBalance = pParent;
         while (pBalance != nullptr) {
             balance(pBalance);

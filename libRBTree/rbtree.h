@@ -206,10 +206,10 @@ private:
 
         std::cout << node->data.first;
         if (node->color == RED) {
-            std::cout << "(RED)" << std::endl;
+            std::cout << "(R)" << std::endl;
         }
         else {
-            std::cout << "(BLACK)" << std::endl;
+            std::cout << "(B)" << std::endl;
         }
 
         //затем левое поддерево
@@ -229,26 +229,26 @@ public:
         clear(root);
     }
     void insert(Tkey key, Tvalue value) {
-        RBTreeNode<Tkey, Tvalue>* z = new RBTreeNode<Tkey, Tvalue>(key, value);
-        RBTreeNode<Tkey, Tvalue>* y = nullptr;
-        RBTreeNode<Tkey, Tvalue>* x = root;
+        RBTreeNode<Tkey, Tvalue>* pNew = new RBTreeNode<Tkey, Tvalue>(key, value);
+        RBTreeNode<Tkey, Tvalue>* pParent = nullptr; // будущий родитель для вставляемого
+        RBTreeNode<Tkey, Tvalue>* pCurrent = root;
 
-        while (x != nullptr) {
-            y = x;
-            if (key == x->data.first) {
-                delete z; 
+        while (pCurrent != nullptr) {
+            pParent = pCurrent;
+            if (key == pCurrent->data.first) {
+                delete pNew;
                 return;   
             }
-            if (key < x->data.first) x = x->left;
-            else x = x->right;
+            if (key < pCurrent->data.first) pCurrent = pCurrent->left;
+            else pCurrent = pCurrent->right;
         }
 
-        z->parent = y;
-        if (y == nullptr) root = z;
-        else if (z->data.first < y->data.first) y->left = z;
-        else y->right = z;
+        pNew->parent = pParent;
+        if (pParent == nullptr) root = pNew;
+        else if (pNew->data.first < pParent->data.first) pParent->left = pNew;
+        else pParent->right = pNew;
 
-        recalc_balance(z);
+        recalc_balance(pNew);
     }
     void print() {
         if (root == nullptr) {
