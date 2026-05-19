@@ -3,7 +3,7 @@
 #include <queue>
 #include <vector>
 #include <list>
-#include <algorithm> // Для std::reverse
+#include <algorithm>
 #include <stdexcept>
 
 template<typename T>
@@ -83,16 +83,26 @@ public:
         int u_ind = (int)u;
         int v_ind = (int)v;
         if (u_ind >= count_vertices || v_ind >= count_vertices) return;
-
-        // Исправлено: правильное удаление из std::list с помощью remove_if
-        vertices[u_ind].neighbors.remove_if([v](const Edge<T>& edge) {
-            return edge.to == v;
-            });
+        auto it = vertices[u_ind].neighbors.begin();
+        while (it != vertices[u_ind].neighbors.end()) {
+            if (it->to == v) {
+                it = vertices[u_ind].neighbors.erase(it);
+            }
+            else {
+                ++it;
+            }
+        }
 
         if (!isOriented) {
-            vertices[v_ind].neighbors.remove_if([u](const Edge<T>& edge) {
-                return edge.to == u;
-                });
+            auto it_rev = vertices[v_ind].neighbors.begin();
+            while (it_rev != vertices[v_ind].neighbors.end()) {
+                if (it_rev->to == u) {
+                    it_rev = vertices[v_ind].neighbors.erase(it_rev);
+                }
+                else {
+                    ++it_rev;
+                }
+            }
         }
     }
 
@@ -122,22 +132,18 @@ public:
         }
     }
 
-    // Название исправлено на dijkstra (опционально)
     std::vector<int> dijkstra(T start, T end) {
-        // Исправлено: используем другие имена переменных (s и e)
         int s = (int)start;
         int e = (int)end;
 
         if (s >= count_vertices || e >= count_vertices || s < 0 || e < 0) {
             throw std::logic_error("Таких вершин не существует\n");
-            // Убрано 'return;' так как throw прерывает выполнение
         }
 
         const int INF = 1e9 + 7;
         std::vector<int> ans(count_vertices, INF);
         std::vector<int> pr(count_vertices, -1);
 
-        // Исправлено: добавлены недостающие std::
         std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<std::pair<int, int>>> q;
 
         ans[s] = 0;
@@ -168,7 +174,6 @@ public:
             }
         }
 
-        // Исправлено: возвращаем пустой вектор корректно
         if (ans[e] == INF) { return {}; }
 
         std::vector<int> path;
