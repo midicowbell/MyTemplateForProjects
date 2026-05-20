@@ -14,6 +14,12 @@ struct Vertex {
 	std::list<Edge<T>> neighbors;
 };
 template<typename T>
+struct EdgeInput {
+	T from;
+	T to;
+	int weight = 1;
+};
+template<typename T>
 class AdjListGraph {
 private:
 	int count_vertices;
@@ -21,32 +27,35 @@ private:
 	bool isOriented;
 	bool isWeighted;
 public:
-	AdjListGraph(int n, bool oriented, bool weighted, std::vector<std::pair<T, T>> _data) {
+	AdjListGraph(int n, bool oriented, bool weighted, const std::vector<EdgeInput<T>>& _data) {
 		count_vertices = n;
 		isOriented = oriented;
 		isWeighted = weighted;
 		vertices.resize(n);
+
 		for (int i = 0; i < n; i++) {
 			vertices[i].data = (T)i;
 		}
-		for (const auto& p : _data) {
-			int u_ind = (int)p.first;
-			int v_ind = (int)p.second;
+
+		// Пробегаемся по нашей красивой структуре
+		for (const auto& edge : _data) {
+			int w = isWeighted ? edge.weight : 1;
+
+			int u_ind = (int)edge.from;
+			int v_ind = (int)edge.to;
 
 			if (u_ind >= count_vertices || v_ind >= count_vertices) continue;
 
-			int w = 1;
-
 			// прямая связь
 			Edge<T> new_edge;
-			new_edge.to = p.second;
+			new_edge.to = edge.to;
 			new_edge.weight = w;
 			vertices[u_ind].neighbors.push_back(new_edge);
 
-			// обратная связь
+			// обратная связь для неориентированного графа
 			if (!isOriented) {
 				Edge<T> reserve_edge;
-				reserve_edge.to = p.first;
+				reserve_edge.to = edge.from;
 				reserve_edge.weight = w;
 				vertices[v_ind].neighbors.push_back(reserve_edge);
 			}
@@ -103,8 +112,6 @@ public:
 	}
 	void delete_vertex(T v_to_delete) {
 		int del_idx = (int)v_to_delete;
-
-		// используем актуальный размер, а не count_vertices
 		if (del_idx < 0 || del_idx >= (int)vertices.size()) return;
 
 		for (int i = 0; i < (int)vertices.size(); i++) {

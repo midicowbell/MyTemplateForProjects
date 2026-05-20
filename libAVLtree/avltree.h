@@ -270,4 +270,7 @@ public:
             pTemp = pTemp->_parent;
         }
     }
+    const AVLNode<Tkey, Tvalue>* get_root() const {
+        return _root;
+    }
 };

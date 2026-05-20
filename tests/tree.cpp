@@ -282,7 +282,49 @@ TEST(AVLTreeTest, RotationRL) {
     */
     EXPECT_EQ(tree.height(), 2);
 }
+TEST(AVLTreeTest, DeleteTriggersDoubleRotation) {
+    AVLTree<int, int> tree;
 
+     /*
+     *        40  (Баланс: -1)
+     *       /  \
+     *     20    60 (Баланс: +1)
+     *          /
+     *        50
+     */
+    tree.insert(40,40);
+    tree.insert(20,20);
+    tree.insert(60,60);
+    tree.insert(50,50);
+    EXPECT_NO_THROW(tree.remove(20));
+    /*
+     * ШАГ 2: Удаление левого узла (20)
+     * Это разрушает баланс корня.
+     *
+     *        40  (Баланс: -2) <-- КРИТИЧЕСКИЙ УЗЕЛ!
+     *          \
+     *           60 (Баланс: +1)
+     *          /
+     *        50
+     *
+     */
+
+    /*
+    * Малый правый поворот вокруг 60
+     *        40  
+     *          \
+     *           50  
+     *             \
+     *              60
+     * 
+     * Малый левый поворот вокруг 40
+     *         50 
+     *        /  \
+     *      40    60
+     * 
+     */
+    EXPECT_EQ(tree.find(50) != nullptr, true);
+}
 // СТРЕСС-ТЕСТ
 
 TEST(AVLTreeTest, SequentialInsertStressTest) {
@@ -340,29 +382,34 @@ TEST(MatrixGraphTest, InvalidIndicesProtection) {
 
 //ТЕСТЫ ДЛЯ СПИСКА
 TEST(ListGraphTest, ConstructorInsertAndEdgeDelete) {
-    std::vector<std::pair<int, int>> initial_edges = { {0, 1}, {1, 2} };
+    std::vector<EdgeInput<int>> initial_edges = { {0, 1}, {1, 2} };
     AdjListGraph<int> g(4, false, false, initial_edges);
+
     EXPECT_NO_THROW(g.add_edge(2, 3, 1));
     EXPECT_NO_THROW(g.delete_edge(0, 1));
     EXPECT_NO_THROW(g.delete_edge(2, 3));
 }
 
 TEST(ListGraphTest, AddEdgesAndPhysicalVertexDelete) {
-    std::vector<std::pair<int, int>> empty_data;
+    std::vector<EdgeInput<int>> empty_data;
     AdjListGraph<int> g(5, false, false, empty_data);
+
     g.add_edge(0, 1, 1);
     g.add_edge(1, 2, 1);
     g.add_edge(2, 3, 1);
     g.add_edge(3, 4, 1);
+
     EXPECT_NO_THROW(g.delete_vertex(2));
     EXPECT_NO_THROW(g.delete_vertex(10));
 }
+
 TEST(ListGraphTest, InsertAndRunDijkstra) {
-    std::vector<std::pair<int, int>> empty_data;
+    std::vector<EdgeInput<int>> empty_data;
     AdjListGraph<int> g(4, false, true, empty_data);
+
     g.add_edge(0, 1, 5);
     g.add_edge(1, 2, 3);
-    g.add_edge(0, 2, 10); 
+    g.add_edge(0, 2, 10);
     g.add_edge(2, 3, 2);
 
     EXPECT_NO_THROW(g.djikrstra(0, 3));
@@ -370,14 +417,16 @@ TEST(ListGraphTest, InsertAndRunDijkstra) {
 }
 
 TEST(ListGraphTest, DijkstraExecution) {
-    std::vector<std::pair<int, int>> data = { {0, 1}, {1, 2} };
+    std::vector<EdgeInput<int>> data = { {0, 1, 5}, {1, 2, 10} };
     AdjListGraph<int> g(3, false, true, data);
+
     EXPECT_NO_THROW(g.djikrstra(0, 2));
 }
 
 TEST(ListGraphTest, VertexDeletionIntegrity) {
-    std::vector<std::pair<int, int>> data = { {0, 1}, {1, 2}, {2, 0} };
+    std::vector<EdgeInput<int>> data = { {0, 1}, {1, 2}, {2, 0} };
     AdjListGraph<int> g(3, true, false, data);
+
     EXPECT_NO_THROW(g.delete_vertex(1));
 }
 
