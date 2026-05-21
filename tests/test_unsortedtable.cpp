@@ -177,6 +177,40 @@ TEST(SortedTableOnVecTest, BinarySearchCorrectPositions) {
     EXPECT_EQ(t.binary_search(35), 3);
 }
 
+TEST(SortedTableOnVecTest, DynamicStrictOrderingInPrint) {
+    SortedTableOnVec<int, std::string> t;
+    std::vector<int> expected_keys;
+
+    for (int i = 1; i <= 50; ++i) {
+        expected_keys.push_back(i * 100);
+    }
+
+    std::vector<int> insert_order = expected_keys;
+    auto rd = std::random_device{};
+    auto rng = std::default_random_engine{ rd() };
+    std::shuffle(insert_order.begin(), insert_order.end(), rng);
+
+    for (int k : insert_order) {
+        t.insert(k, "DATA");
+    }
+
+    std::ostringstream os;
+    t.print(os);
+    std::string output = os.str();
+
+    size_t last_pos = 0;
+    for (int i = 0; i < expected_keys.size(); ++i) {
+        std::string key_str = std::to_string(expected_keys[i]);
+        size_t curr_pos = output.find(key_str);
+        EXPECT_NE(curr_pos, std::string::npos) << "Key " << key_str << " not found in print output!";
+
+        if (i > 0) {
+            EXPECT_GT(curr_pos, last_pos) << "Ordering violated: " << expected_keys[i] << " is printed before " << expected_keys[i - 1];
+        }
+        last_pos = curr_pos;
+    }
+}
+
 // вставка и поиск
 TEST(UnsortedTableOnListTest, InsertAndFind) {
     UnsortedTableOnList<int, std::string> t;
@@ -256,7 +290,7 @@ TEST(UnsortedTableOnListTest, EraseNonExistingDoesNothing) {
 
     t.insert(1, "one");
 
-    t.erase(999); 
+    t.erase(999);
 
     EXPECT_TRUE(t.consist(1));
 }
@@ -283,8 +317,6 @@ TEST(UnsortedTableOnListTest, PrintDoesNotCrash) {
     EXPECT_NO_THROW(t.print(os));
 }
 
-
-
 TEST_F(TreeTableAdvancedTest, FindReturnsModifiableReference) {
     table.insert(1, "Original");
 
@@ -293,21 +325,20 @@ TEST_F(TreeTableAdvancedTest, FindReturnsModifiableReference) {
     EXPECT_EQ(table.find(1), "ChangedViaReference");
 }
 
-// ТЕСТ ВЫРОЖДЕННОГО ДЕРЕВА
 TEST_F(TreeTableAdvancedTest, LongChainSequentialInsert) {
     for (int i = 0; i < 100; ++i) {
         table.insert(i, "val_" + std::to_string(i));
     }
 
-    EXPECT_EQ(table.find(0), "val_0");   
-    EXPECT_EQ(table.find(99), "val_99"); 
+    EXPECT_EQ(table.find(0), "val_0");
+    EXPECT_EQ(table.find(99), "val_99");
     EXPECT_TRUE(table.consist(50));
 }
 
 //ТЕСТ СЛОЖНОГО УДАЛЕНИЯ
 TEST_F(TreeTableAdvancedTest, RemoveNodeWithTwoChildren) {
     /* Структура:
-          50
+         50
          /  \
         30   70
        / \   / \
@@ -325,8 +356,8 @@ TEST_F(TreeTableAdvancedTest, RemoveNodeWithTwoChildren) {
 
     EXPECT_FALSE(table.consist(50));
     EXPECT_EQ(table.find(60), "RL");
-    EXPECT_EQ(table.find(30), "L"); 
-    EXPECT_EQ(table.find(70), "R"); 
+    EXPECT_EQ(table.find(30), "L");
+    EXPECT_EQ(table.find(70), "R");
 }
 
 // ТЕСТ НА СТРЕСС И РАНДОМ
@@ -354,7 +385,6 @@ TEST_F(TreeTableAdvancedTest, StressRandomInsertErase) {
 
 //  ТЕСТ REPLACE
 TEST_F(TreeTableAdvancedTest, ReplaceLogicComprehensive) {
-
     table.insert(10, "Initial");
     table.replace(10, "Updated");
     EXPECT_EQ(table.find(10), "Updated");
@@ -364,7 +394,7 @@ TEST_F(TreeTableAdvancedTest, ReplaceLogicComprehensive) {
 // ТЕСТ ИСКЛЮЧЕНИЙ НА ПУСТОЙ ТАБЛИЦЕ
 TEST_F(TreeTableAdvancedTest, EmptyTableExceptions) {
     EXPECT_THROW(table.find(10), std::out_of_range);
-    EXPECT_NO_THROW(table.erase(10)); 
+    EXPECT_NO_THROW(table.erase(10));
     EXPECT_TRUE(table.is_empty());
 }
 
@@ -386,54 +416,35 @@ TEST_F(TreeTableAdvancedTest, SortingIntegrityInPrint) {
     EXPECT_TRUE(p10 < p20 && p20 < p30 && p30 < p40 && p40 < p50);
 }
 
+TEST_F(TreeTableAdvancedTest, DynamicStrictOrderingInPrint) {
+    std::vector<int> expected_keys;
+    for (int i = 1; i <= 50; ++i) expected_keys.push_back(i * 100);
 
+    std::vector<int> insert_order = expected_keys;
+    auto rd = std::random_device{};
+    auto rng = std::default_random_engine{ rd() };
+    std::shuffle(insert_order.begin(), insert_order.end(), rng);
 
-// ТЕСТЫ БАЛАНСИРОВКИ (ПОВОРОТЫ)
+    for (int k : insert_order) table.insert(k, "DATA");
 
-TEST_F(TableAVLAdvancedTest, RotationLL) {
-    table.insert(30, "A");
-    table.insert(20, "B");
-    table.insert(10, "C"); 
+    std::ostringstream os;
+    table.print(os);
+    std::string output = os.str();
 
-    EXPECT_TRUE(table.consist(10));
-    EXPECT_TRUE(table.consist(20));
-    EXPECT_TRUE(table.consist(30));
-    EXPECT_EQ(table.find(20), "B");
+    size_t last_pos = 0;
+    for (int i = 0; i < expected_keys.size(); ++i) {
+        std::string key_str = std::to_string(expected_keys[i]);
+        size_t curr_pos = output.find(key_str);
+
+        EXPECT_NE(curr_pos, std::string::npos);
+        if (i > 0) {
+            EXPECT_GT(curr_pos, last_pos) << "BST In-order violated: " << expected_keys[i] << " appears before " << expected_keys[i - 1];
+        }
+        last_pos = curr_pos;
+    }
 }
 
-TEST_F(TableAVLAdvancedTest, RotationRR) {
-    table.insert(10, "A");
-    table.insert(20, "B");
-    table.insert(30, "C"); 
-
-    EXPECT_TRUE(table.consist(10));
-    EXPECT_TRUE(table.consist(20));
-    EXPECT_TRUE(table.consist(30));
-}
-
-TEST_F(TableAVLAdvancedTest, RotationLR) {
-    table.insert(30, "A");
-    table.insert(10, "B");
-    table.insert(20, "C");
-
-    EXPECT_TRUE(table.consist(10));
-    EXPECT_TRUE(table.consist(20));
-    EXPECT_TRUE(table.consist(30));
-}
-
-TEST_F(TableAVLAdvancedTest, RotationRL) {
-    table.insert(10, "A");
-    table.insert(30, "B");
-    table.insert(20, "C");
-
-    EXPECT_TRUE(table.consist(10));
-    EXPECT_TRUE(table.consist(20));
-    EXPECT_TRUE(table.consist(30));
-}
-
-// УДАЛЕНИЕ С КАСКАДНОЙ БАЛАНСИРОВКОЙ
 TEST_F(TableAVLAdvancedTest, EraseWithCascadingBalance) {
-  
     std::vector<int> keys = { 50, 25, 75, 10, 30, 60, 80, 5, 15, 27, 35 };
     for (int k : keys) {
         table.insert(k, std::to_string(k));
@@ -502,7 +513,7 @@ TEST_F(TableAVLAdvancedTest, ReplaceAndExceptionsLogic) {
     EXPECT_THROW(table.replace(20, "New"), std::invalid_argument);
     EXPECT_THROW(table.find(999), std::invalid_argument);
 
-    EXPECT_NO_THROW(table.erase(999)); 
+    EXPECT_NO_THROW(table.erase(999));
 }
 
 // ПЕЧАТЬ
@@ -520,10 +531,45 @@ TEST_F(TableAVLAdvancedTest, SortingIntegrityInPrint) {
     size_t p40 = s.find("40");
     size_t p50 = s.find("50");
 
-    EXPECT_TRUE(p10 != std::string::npos); 
+    EXPECT_TRUE(p10 != std::string::npos);
     EXPECT_TRUE(p10 < p20 && p20 < p30 && p30 < p40 && p40 < p50);
 }
 
+TEST_F(TableAVLAdvancedTest, DynamicStrictOrderingInPrint) {
+    std::vector<int> expected_keys;
+    for (int i = 1; i <= 50; ++i) expected_keys.push_back(i * 100);
+
+    std::vector<int> insert_order = expected_keys;
+    auto rd = std::random_device{};
+    auto rng = std::default_random_engine{ rd() };
+    std::shuffle(insert_order.begin(), insert_order.end(), rng);
+
+    for (int k : insert_order) table.insert(k, "DATA");
+
+    table.erase(1500);
+    table.erase(2500);
+    table.erase(3500);
+
+    expected_keys.erase(std::remove(expected_keys.begin(), expected_keys.end(), 1500), expected_keys.end());
+    expected_keys.erase(std::remove(expected_keys.begin(), expected_keys.end(), 2500), expected_keys.end());
+    expected_keys.erase(std::remove(expected_keys.begin(), expected_keys.end(), 3500), expected_keys.end());
+
+    std::ostringstream os;
+    table.print(os);
+    std::string output = os.str();
+
+    size_t last_pos = 0;
+    for (int i = 0; i < expected_keys.size(); ++i) {
+        std::string key_str = std::to_string(expected_keys[i]);
+        size_t curr_pos = output.find(key_str);
+
+        EXPECT_NE(curr_pos, std::string::npos);
+        if (i > 0) {
+            EXPECT_GT(curr_pos, last_pos) << "AVL rotation broke sorting: " << expected_keys[i] << " appears before " << expected_keys[i - 1];
+        }
+        last_pos = curr_pos;
+    }
+}
 
 
 // Тест на переполнение
@@ -579,7 +625,7 @@ TEST(DoubleHashingHardcore, EmptyTableOperations) {
     EXPECT_THROW(table.replace("ghost", 5), std::logic_error);
 }
 
-// тест на дубликаты
+//тест на дубликаты
 TEST(DoubleHashingHardcore, DuplicatesLogic) {
     HashTableDoubleHashing<int> table(11);
     table.insert("clone", 1);
@@ -590,6 +636,23 @@ TEST(DoubleHashingHardcore, DuplicatesLogic) {
     EXPECT_EQ(table.find("clone"), 500);
 }
 
+// Тест на коллизии
+TEST(DoubleHashingHardcore, CollisionResolution) {
+    HashTableDoubleHashing<int> table(5);
+
+    table.insert("Alpha", 100);
+    table.insert("Beta", 200);
+    table.insert("Gamma", 300);
+    table.insert("Delta", 400);
+
+    EXPECT_EQ(table.find("Alpha"), 100);
+    EXPECT_EQ(table.find("Beta"), 200);
+    EXPECT_EQ(table.find("Gamma"), 300);
+    EXPECT_EQ(table.find("Delta"), 400);
+
+    table.replace("Gamma", 333);
+    EXPECT_EQ(table.find("Gamma"), 333);
+}
 
 
 //  Стресс-тест цепочки
@@ -656,11 +719,9 @@ TEST(ChainingHardcore, EraseGhostInPopulatedChain) {
     EXPECT_THROW(table.erase("ghost"), std::logic_error);
     EXPECT_TRUE(table.consist("real"));
 }
-// Проверка автоматической сортировки при вставке в случайном порядке
 TEST(SortedTableOnVecTest, OrderMaintainedOnRandomInsert) {
     SortedTableOnVec<int, std::string> t;
 
-    // Вставляем элементы вразнобой
     t.insert(50, "fifty");
     t.insert(10, "ten");
     t.insert(40, "forty");
@@ -676,12 +737,9 @@ TEST(SortedTableOnVecTest, OrderMaintainedOnRandomInsert) {
     size_t p30 = s.find("30");
     size_t p40 = s.find("40");
     size_t p50 = s.find("50");
-
-    // Проверяем, что в выводе ключи идут строго по возрастанию
     EXPECT_TRUE(p10 < p20 && p20 < p30 && p30 < p40 && p40 < p50);
 }
 
-// Проверка сохранения порядка после удаления элементов из разных частей вектора
 TEST(SortedTableOnVecTest, OrderMaintainedAfterErase) {
     SortedTableOnVec<int, std::string> t;
 
@@ -690,7 +748,6 @@ TEST(SortedTableOnVecTest, OrderMaintainedAfterErase) {
     t.insert(40, "40");
     t.insert(20, "20");
 
-    // Удаляем элемент из середины (20) и конца (40)
     t.erase(20);
     t.erase(40);
 
@@ -705,9 +762,7 @@ TEST(SortedTableOnVecTest, OrderMaintainedAfterErase) {
     EXPECT_EQ(s.find("20"), std::string::npos);
     EXPECT_EQ(s.find("40"), std::string::npos);
 }
-// Проверка упорядоченности BST после удаления корня и сложных узлов
 TEST_F(TreeTableAdvancedTest, OrderIntegrityAfterComplexErase) {
-    // Строим дерево
     table.insert(100, "root");
     table.insert(50, "L");
     table.insert(150, "R");
@@ -716,26 +771,21 @@ TEST_F(TreeTableAdvancedTest, OrderIntegrityAfterComplexErase) {
     table.insert(125, "RL");
     table.insert(175, "RR");
 
-    // Удаляем корень (100) — у него два потомка
     table.erase(100);
-    // Удаляем узел с одним или двумя потомками (50)
     table.erase(50);
 
     std::ostringstream os;
     table.print(os);
     std::string s = os.str();
 
-    // Оставшиеся ключи: 25, 75, 125, 150, 175
     size_t p25 = s.find("25");
     size_t p75 = s.find("75");
     size_t p125 = s.find("125");
     size_t p150 = s.find("150");
     size_t p175 = s.find("175");
 
-    // Инвариант упорядоченного обхода (In-order traversal) должен сохраняться
     EXPECT_TRUE(p25 < p75 && p75 < p125 && p125 < p150 && p150 < p175);
 }
-// Проверка, что балансировка (вращения) в AVL не нарушает порядок ключей
 TEST_F(TableAVLAdvancedTest, SortingIntegrityAfterMassiveRotations) {
     std::vector<int> random_keys = { 15, 10, 20, 5, 12, 18, 25, 3, 8, 11, 14, 16, 19, 22, 27 };
 
@@ -743,27 +793,22 @@ TEST_F(TableAVLAdvancedTest, SortingIntegrityAfterMassiveRotations) {
         table.insert(k, ".");
     }
 
-    // Проверяем исходный порядок
     std::ostringstream os1;
     table.print(os1);
     std::string s1 = os1.str();
 
-    // Проверяем последовательность позиций выборочно
     EXPECT_TRUE(s1.find("3") < s1.find("5"));
     EXPECT_TRUE(s1.find("12") < s1.find("14"));
     EXPECT_TRUE(s1.find("22") < s1.find("25"));
 
-    // Теперь провоцируем серию вращений через удаление узлов
     table.erase(5);
     table.erase(20);
-    table.erase(15); // Удаление корня
+    table.erase(15); 
 
     std::ostringstream os2;
     table.print(os2);
     std::string s2 = os2.str();
 
-    // Проверяем, что оставшиеся элементы всё еще идеально отсортированы
-    // Оставшиеся для теста: 3, 8, 10, 11, 12, 14
     size_t p3 = s2.find("3");
     size_t p8 = s2.find("8");
     size_t p10 = s2.find("10");
