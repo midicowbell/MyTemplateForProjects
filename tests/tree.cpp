@@ -486,13 +486,7 @@ TEST_F(RBTreeTest, Case2And3Rotations) {
             20(B)
              /    \
           10(R)  30(R)
-    */
-
-
-
-
-
-
+    /*
     // создаем "зигзаг" для case 2
     tree.insert(50, "G2");
     tree.insert(40, "P2");
