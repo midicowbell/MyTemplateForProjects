@@ -257,4 +257,19 @@ public:
         }
         printRecursive(root, "", true, true);
     }
+    RBTreeNode<Tkey, Tvalue>* find(Tkey key) {
+        RBTreeNode<Tkey, Tvalue>* pCurrent = root;
+        while (pCurrent != nullptr) {
+            if (key == pCurrent->data.first) {
+                return pCurrent;
+            }
+            if (key < pCurrent->data.first) {
+                pCurrent = pCurrent->left;
+            }
+            else {
+                pCurrent = pCurrent->right;
+            }
+        }
+        return nullptr;
+    }
 };
