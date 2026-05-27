@@ -533,8 +533,6 @@ TEST(AVLTreeTest, NotebookCascadeDeleteLeaf25) {
   ( 5 )      ( 20 ) ( 45 )  ( 55 )   ( 75 )
  */
 }
-
-// 2. Тест по первому скриншоту: Вставка тройки (3) с глубокой балансировкой левой ветки
 TEST(AVLTreeTest, NotebookInsertThreeDeepRotation) {
     AVLTree<int, int> tree;
     // правая сторона
