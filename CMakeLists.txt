@@ -12,7 +12,8 @@ include_directories(lib_list)
 include_directories(libSortedTableOnVec)
 include_directories(libBSTree)
 include_directories(libAVLtree)
-include_directories(libRBtree)
+include_directories(libRBTree)
+include_directories(libTree)
 
 add_subdirectory(libITable)
 add_subdirectory(libUnsortedTableOnVec)
@@ -20,6 +21,10 @@ add_subdirectory(libSortedTableOnVec)
 add_subdirectory(libUnsortedTableOnList)
 add_subdirectory(libSortedTableOnBST)
 add_subdirectory(libSortedTableOnRBTree)
+add_subdirectory(libHashTable)
+add_subdirectory(libUnsortedTableOnTree)
+
+
 add_subdirectory(src)
 
 

@@ -16,7 +16,7 @@ struct ChainNode {
 template<typename Tvalue>
 class HashTableChaining : public Itable<std::string, Tvalue> {
 private:
-    std::vector<std::vector<ChainNode<Tvalue>>> _rows;
+    std::vector<std::list<ChainNode<Tvalue>>> _rows;
     size_t _size;
     size_t _count = 0;
 

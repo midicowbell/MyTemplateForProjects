@@ -1,0 +1,6 @@
+add_library(UnsortedTableOnTree unsortedTableOnTree.cpp)
+
+
+target_link_libraries(UnsortedTableOnTree PUBLIC itable)
+target_link_libraries(UnsortedTableOnTree PUBLIC list)
+target_include_directories(UnsortedTableOnTree PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

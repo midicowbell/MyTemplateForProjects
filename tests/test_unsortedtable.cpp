@@ -8,6 +8,7 @@
 #include "../libSortedTableOnAVL/tableAVL.h"
 #include "../libHashTable/hashTable2.h"
 #include "../libHashTable/hashTable3.h"
+#include "../libRBTree/rbtree.h"
 #include <string>
 #include <ostream>
 #include <algorithm>
@@ -21,6 +22,10 @@ protected:
 class TableAVLAdvancedTest : public ::testing::Test {
 protected:
     TableAVL<int, std::string> table;
+};
+class TableRBTreeAdvancedTest : public ::testing::Test {
+protected:
+    RBTree<int, std::string> table;
 };
 
 // Вставка и поиск
@@ -817,4 +822,70 @@ TEST_F(TableAVLAdvancedTest, SortingIntegrityAfterMassiveRotations) {
     size_t p14 = s2.find("14");
 
     EXPECT_TRUE(p3 < p8 && p8 < p10 && p10 < p11 && p11 < p12 && p12 < p14);
+}
+
+TEST_F(TableRBTreeAdvancedTest, InsertAndFind) {
+    table.insert(10, "ten");
+    table.insert(5, "five");
+    table.insert(20, "twenty");
+
+    EXPECT_EQ(table.find(10), "ten");
+    EXPECT_EQ(table.find(5), "five");
+    EXPECT_EQ(table.find(20), "twenty");
+}
+
+TEST_F(TableRBTreeAdvancedTest, ConsistWorks) {
+    table.insert(3, "three");
+
+    EXPECT_TRUE(table.consist(3));
+    EXPECT_FALSE(table.consist(4));
+}
+
+TEST_F(TableRBTreeAdvancedTest, ReplaceExisting) {
+    table.insert(7, "seven");
+    table.replace(7, "SEVEN");
+
+    EXPECT_EQ(table.find(7), "SEVEN");
+}
+
+TEST_F(TableRBTreeAdvancedTest, FindReturnsModifiableReference) {
+    table.insert(42, "OriginalValue");
+
+    std::string& ref = table.find(42);
+    ref = "ChangedViaReference";
+
+    EXPECT_EQ(table.find(42), "ChangedViaReference");
+}
+
+
+TEST_F(TableRBTreeAdvancedTest, SortingIntegrityInPrint) {
+    std::vector<int> input = { 40, 10, 50, 20, 30 };
+    for (int x : input) {
+        table.insert(x, ".");
+    }
+
+    std::ostringstream os;
+    table.print(os);
+    std::string s = os.str();
+
+    size_t p10 = s.find("10");
+    size_t p20 = s.find("20");
+    size_t p30 = s.find("30");
+    size_t p40 = s.find("40");
+    size_t p50 = s.find("50");
+
+    EXPECT_TRUE(p10 != std::string::npos);
+    EXPECT_TRUE(p10 < p20 && p20 < p30 && p30 < p40 && p40 < p50);
+}
+
+TEST_F(TableRBTreeAdvancedTest, MassiveSequentialInsert) {
+    const int N = 1000;
+    for (int i = 0; i < N; ++i) {
+        table.insert(i, "val_" + std::to_string(i));
+    }
+
+    EXPECT_EQ(table.find(0), "val_0");
+    EXPECT_EQ(table.find(N - 1), "val_999");
+    EXPECT_EQ(table.find(N / 2), "val_500");
+    EXPECT_TRUE(table.consist(250));
 }
