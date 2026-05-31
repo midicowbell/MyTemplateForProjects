@@ -14,6 +14,11 @@ protected:
     RBTree<int, std::string> tree;
 };
 
+class AVLTreeTestt : public ::testing::Test {
+protected:
+    AVLTree<int, std::string> table;
+};
+
 TEST(TreeFullTest, BasicInsertAndEmpty) {
     Tree<int, std::string> tree;
     EXPECT_TRUE(tree.is_empty());
@@ -449,90 +454,63 @@ TEST(RBTreeVisualTest, PrintWithLines) {
 
     SUCCEED();
 }
+// 2 test
+TEST_F(AVLTreeTestt, Insert5FromImage) {
+    std::vector<int> base = { 40, 20, 60, 15, 25, 50, 70, 45, 55, 65, 80, 5, 75 };
 
-TEST(AVLTreeTest, NotebookCascadeDeleteLeaf25) {
-    AVLTree<int, int> tree;
-
-    // правя ветка
-    tree.insert(40, 40);
-    tree.insert(60, 60);
-    tree.insert(50, 50);
-    tree.insert(70, 70);
-    tree.insert(45, 45);
-    tree.insert(55, 55);
-    tree.insert(65, 65);
-    tree.insert(80, 80);
-    tree.insert(75, 75); 
-
-    // левая ветка
-    tree.insert(20, 20);
-    tree.insert(15, 15);
-    tree.insert(25, 25); 
-    tree.insert(5, 5);   
-
-    ASSERT_NE(tree.find(25), nullptr);
-
-    EXPECT_NO_THROW(tree.remove(25));
-
-    EXPECT_EQ(tree.find(25), nullptr);
-
-    // Проверяем, что каскад из двух поворотов не порвал связи у остальных узлов
-    std::vector<int> expected_keys = { 40, 20, 60, 15, 5, 50, 70, 45, 55, 65, 80, 75 };
-    for (int k : expected_keys) {
-        EXPECT_NE(tree.find(k), nullptr) << "Каскадная балансировка после удаления 25 потеряла узел: " << k;
+    for (int k : base) {
+        table.insert(k, "DATA");
     }
+    ASSERT_NE(table.find(25), nullptr);
+    EXPECT_NO_THROW({
+        table.remove(25);
+        });
+    auto* root = table.get_root();
+    ASSERT_NE(root, nullptr) << "дерево пустое";
 
-    EXPECT_LE(tree.height(), 4);
-/*
-                      ( 40 ) [+1]
-                     /          \
-           ( 20 ) [-1]          ( 60 ) [+1]
-          /          \          /          \
-     ( 15 )          ( 25 )   ( 50 )        ( 70 )
-    /                         /   \         /   \
- ( 5 )                    ( 45 ) ( 55 )  ( 65 ) ( 80 )
-                                                /
-                                             ( 75 )
-*/
- /*
-                       ( 40 ) [+1]
-                      /          \
-           *( 20 ) [-2]          ( 60 ) [+1]
-           /          \          /          \
-      ( 15 )          [  ]     ( 50 )        ( 70 )
-     /                         /   \         /   \
-  ( 5 )                    ( 45 ) ( 55 )  ( 65 ) ( 80 )
-                                                 /
-                                              ( 75 )
- */
+    EXPECT_EQ(root->_data.first, 60);
 
- //
- // Правый поворот вокруг 20
- //
- /*
- 
-                      *( 40 ) [+2]  
-                      /          \
-                  ( 15 )          ( 60 ) [+1]
-                /      \          /          \
-           ( 5 )        ( 20 )  ( 50 )        ( 70 )
-                               /   \         /   \
-                           ( 45 ) ( 55 )  ( 65 ) ( 80 )
-                                                 /
-                                              ( 75 )
- */
+    auto* n40 = root->_left;
+    auto* n70 = root->_right;
 
- // финальный левый поворот вокруг 40
- /*
-                       ( 60 ) [0]
-                      /          \
-            ( 40 ) [0]            ( 70 ) [0]
-           /          \          /      \
-      ( 15 )          ( 50 )  ( 65 )    ( 80 )
-     /      \        /      \           /
-  ( 5 )      ( 20 ) ( 45 )  ( 55 )   ( 75 )
- */
+    ASSERT_NE(n40, nullptr);
+    ASSERT_NE(n70, nullptr);
+    EXPECT_EQ(n40->_data.first, 40);
+    EXPECT_EQ(n70->_data.first, 70);
+
+    auto* n15 = n40->_left;
+    auto* n50 = n40->_right; 
+
+    ASSERT_NE(n15, nullptr);
+    ASSERT_NE(n50, nullptr);
+    EXPECT_EQ(n15->_data.first, 15);
+    EXPECT_EQ(n50->_data.first, 50);
+
+    auto* n65 = n70->_left;
+    auto* n80 = n70->_right;
+
+    ASSERT_NE(n65, nullptr);
+    ASSERT_NE(n80, nullptr);
+    EXPECT_EQ(n65->_data.first, 65);
+    EXPECT_EQ(n80->_data.first, 80);
+
+    ASSERT_NE(n15->_left, nullptr);
+    ASSERT_NE(n15->_right, nullptr);
+    EXPECT_EQ(n15->_left->_data.first, 5);
+    EXPECT_EQ(n15->_right->_data.first, 20); 
+
+    ASSERT_NE(n50->_left, nullptr);
+    ASSERT_NE(n50->_right, nullptr);
+    EXPECT_EQ(n50->_left->_data.first, 45);
+    EXPECT_EQ(n50->_right->_data.first, 55);
+
+    ASSERT_NE(n80->_left, nullptr);
+    EXPECT_EQ(n80->_left->_data.first, 75);
+    EXPECT_EQ(n80->_right, nullptr);
+
+    EXPECT_LE(table.height(), 4);
 }
+// 1 test
 TEST(AVLTreeTest, NotebookInsertThreeDeepRotation) {
     AVLTree<int, int> tree;
     // правая сторона
@@ -556,7 +534,7 @@ TEST(AVLTreeTest, NotebookInsertThreeDeepRotation) {
     EXPECT_EQ(*tree.find(3), 3);
 
     for (int k : {5, 10, 20, 30, 60}) {
-        EXPECT_NE(tree.find(k), nullptr) << "Поворот из-за тройки снес узел: " << k;
+        EXPECT_NE(tree.find(k), nullptr) << "поворот из-за тройки снес узел: " << k;
     }
 
     EXPECT_LE(tree.height(), 4);
@@ -596,6 +574,7 @@ TEST(AVLTreeTest, NotebookInsertThreeDeepRotation) {
                          ( 3 )                  ( 40 )  ( 55 ) ( 70 ) ( 90 )
         */
 }
+// 1 test
 TEST_F(RBTreeTest, PerfectTreeCascadeRecolorToRotation) {
     std::vector<int> base = { 100, 50, 150, 25, 75, 125, 175, 12, 37, 110, 140, 6, 18 };
     for (int k : base) {
@@ -644,4 +623,38 @@ TEST_F(RBTreeTest, PerfectTreeCascadeRecolorToRotation) {
     else {
         FAIL();
     }
+}
+TEST(RBTreeHardcoreTest, CascadeRecolorToRoot) {
+    RBTree<int, std::string> tree;
+    std::vector<int> keys = { 50, 25, 75, 15, 35, 65, 85, 10, 20, 60 };
+    for (int k : keys) {
+        tree.insert(k, "DATA");
+    }
+    ASSERT_NE(tree.find(50), nullptr);
+
+    EXPECT_EQ(tree.find(50)->color, BLACK);
+
+    EXPECT_EQ(tree.find(25)->color, RED);
+    EXPECT_EQ(tree.find(75)->color, RED);
+
+    EXPECT_EQ(tree.find(15)->color, BLACK);
+    EXPECT_EQ(tree.find(35)->color, BLACK);
+    EXPECT_EQ(tree.find(65)->color, BLACK);
+    EXPECT_EQ(tree.find(85)->color, BLACK);
+
+    EXPECT_EQ(tree.find(10)->color, RED);
+    EXPECT_EQ(tree.find(20)->color, RED);
+
+    EXPECT_NO_THROW(tree.insert(5, "BOMB"));
+
+    ASSERT_NE(tree.find(5), nullptr);
+    EXPECT_EQ(tree.find(5)->color, RED); 
+
+    EXPECT_EQ(tree.find(10)->color, BLACK);
+    EXPECT_EQ(tree.find(20)->color, BLACK);
+    EXPECT_EQ(tree.find(15)->color, RED);
+    EXPECT_EQ(tree.find(25)->color, BLACK);
+    EXPECT_EQ(tree.find(75)->color, BLACK);
+
+    EXPECT_EQ(tree.find(50)->color, BLACK);
 }
